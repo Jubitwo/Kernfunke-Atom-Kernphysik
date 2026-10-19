@@ -371,6 +371,166 @@
     return svg(drawing, fissionCaptions[step], 800, 425);
   }
 
+  const decayHeatShare = 5;
+  const plantEfficiency = 0.33;
+  function reactorState(insertion) {
+    if (!Number.isFinite(insertion) || insertion < 0 || insertion > 100) {
+      throw new RangeError('Die Regelstabstellung muss zwischen 0 und 100 Prozent liegen.');
+    }
+    const fissionRate = 100 - insertion;
+    const heat = Math.round(decayHeatShare + (100 - decayHeatShare) * fissionRate / 100);
+    const electric = fissionRate > 0 ? Math.round(heat * plantEfficiency) : 0;
+    const waste = heat - electric;
+    return {
+      insertion, fissionRate, heat, electric, waste,
+      turbineRunning: electric > 0,
+      hotLegTemp: Math.round(292 + 34 * heat / 100),
+      coldLegTemp: 292,
+      coolingOutTemp: Math.round(20 + 10 * waste / 67)
+    };
+  }
+  function mixColor(from, to, share) {
+    const channels = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    const [a, b] = [channels(from), channels(to)];
+    return `rgb(${a.map((value, i) => Math.round(value + (b[i] - value) * share)).join(',')})`;
+  }
+  function flowDuration(share) {
+    return share > 0 ? Math.min(12, 1.1 / share).toFixed(2) : 0;
+  }
+  function pipe(path, color, width, share, marker = '') {
+    const duration = flowDuration(share);
+    let content = `<path d="${path}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linejoin="round"${marker ? ` marker-end="url(#${marker})"` : ''}/>`;
+    if (duration) content += `<path class="flow" style="--flow-duration:${duration}s" d="${path}" stroke="#ffffff" stroke-opacity=".75" stroke-width="${Math.max(1.5, width / 3)}" fill="none" stroke-linejoin="round"/>`;
+    return content;
+  }
+  function anchoredText(x, y, value, size = 13, anchor = 'start', weight = 400) {
+    return `<text x="${x}" y="${y}" font-size="${size}" text-anchor="${anchor}" font-weight="${weight}">${value}</text>`;
+  }
+  function stepBadge(x, y, number) {
+    return `<g data-heat-step="${number}"><circle cx="${x}" cy="${y}" r="11" fill="#1f4e79" stroke="#ffffff" stroke-width="2"/><text x="${x}" y="${y + 4.5}" font-size="13" text-anchor="middle" font-weight="700" style="fill:#ffffff">${number}</text></g>`;
+  }
+  function reactorDrawing(state) {
+    const heatShare = state.heat / 100;
+    const electricShare = state.electric / 100 / plantEfficiency;
+    const wasteShare = state.waste / 67;
+    const hotColor = mixColor('#f0b48a', '#d0312d', heatShare);
+    const coldColor = mixColor('#f3c9a8', '#e0794a', heatShare);
+    const steamColor = mixColor('#d7dde2', '#8e9cab', heatShare);
+    let content = `<defs>
+      <marker id="arrow-heat" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#d0312d"/></marker>
+      <radialGradient id="core-glow"><stop offset="0" stop-color="#ffd166" stop-opacity="${(0.2 + 0.8 * heatShare).toFixed(2)}"/><stop offset="1" stop-color="#f07a2a" stop-opacity="0"/></radialGradient>
+    </defs>`;
+    content += '<path d="M 20 380 V 160 A 147.5 105 0 0 1 315 160 V 380 Z" fill="#eef3f7" stroke="#8fa3b5" stroke-width="4"/>';
+    content += anchoredText(167, 68, 'Sicherheitsbehälter', 12, 'middle');
+    content += '<rect x="340" y="120" width="285" height="260" rx="6" fill="#f6f3ec" stroke="#b5aa94" stroke-width="2"/>';
+    content += anchoredText(482, 140, 'Maschinenhaus', 12, 'middle');
+    content += '<path d="M 10 381 H 750" stroke="#9fb0bf" stroke-width="2"/>';
+
+    content += pipe('M 245 100 V 82 H 360 V 190 H 376', steamColor, 4 + 6 * heatShare, state.turbineRunning ? heatShare : 0);
+    content += anchoredText(300, 74, state.turbineRunning ? 'Dampf ca. 280 °C' : 'kein Dampf zur Turbine', 11, 'middle');
+    content += pipe('M 440 226 V 282', steamColor, 4 + 4 * heatShare, state.turbineRunning ? heatShare : 0);
+    if (!state.turbineRunning) {
+      content += `<g data-cooling-bypass="true">${pipe('M 245 100 V 82 H 360 V 264 H 410 V 282', '#d58b57', 4, heatShare)}</g>`;
+      content += anchoredText(305, 258, 'Restwärme →', 11, 'middle');
+    }
+    content += pipe('M 380 330 H 356 V 362 H 296 V 320 H 275', '#3f86c4', 5, heatShare);
+    content += '<circle cx="328" cy="362" r="8" fill="#ffffff" stroke="#3f86c4" stroke-width="3"/>';
+
+    content += pipe('M 170 175 H 219', hotColor, 9, heatShare);
+    content += pipe('M 219 305 H 170', coldColor, 9, heatShare);
+    content += '<circle cx="194" cy="305" r="10" fill="#ffffff" stroke="#8a5a44" stroke-width="3"/><path d="M 189 305 L 199 300 V 310 Z" fill="#8a5a44"/>';
+    content += anchoredText(193, 194, `${state.hotLegTemp} °C`, 11, 'middle');
+    content += anchoredText(193, 330, `${state.coldLegTemp} °C`, 11, 'middle');
+
+    content += '<rect x="215" y="100" width="60" height="240" rx="26" fill="#f6efe6" stroke="#8a7458" stroke-width="3"/>';
+    content += '<rect x="219" y="104" width="52" height="62" rx="22" fill="#e3e8ec"/>';
+    content += '<rect x="219" y="165" width="52" height="171" rx="4" fill="#a9d3ee" fill-opacity=".75"/>';
+    content += pipe('M 219 175 L 266 190 L 224 205 L 266 220 L 224 235 L 266 250 L 224 265 L 266 280 L 224 295 L 219 305', hotColor, 4, heatShare);
+    const bubbleCount = state.fissionRate > 0 ? Math.round(2 + 10 * heatShare) : 1;
+    for (let i = 0; i < bubbleCount; i++) {
+      const x = 225 + ((i * 0.618) % 1) * 40;
+      const y = 180 + ((i * 0.382 + 0.2) % 1) * 140;
+      content += `<circle class="bubble" style="animation-delay:-${(i * 0.37).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#ffffff" stroke="#6aa6cf"/>`;
+    }
+
+    content += '<rect x="72" y="98" width="86" height="26" rx="4" fill="#7d8c99"/>';
+    content += anchoredText(115, 92, 'Regelstab-Antriebe', 11, 'middle');
+    content += '<rect x="60" y="124" width="110" height="216" rx="36" fill="#dfe7ee" stroke="#4e6375" stroke-width="4"/>';
+    content += '<rect x="68" y="140" width="94" height="192" rx="26" fill="#cfe6f5"/>';
+    content += '<ellipse cx="116" cy="273" rx="70" ry="66" fill="url(#core-glow)"/>';
+    content += `<rect data-core="true" x="74" y="226" width="84" height="94" rx="4" fill="${mixColor('#f8e6cc', '#f2832f', heatShare)}" stroke="#b5651d"/>`;
+    for (let i = 0; i < 7; i++) content += `<rect data-fuel="true" x="${78 + i * 12}" y="230" width="5" height="86" rx="2" fill="#a2561c"/>`;
+    const rodTop = 112;
+    const rodLength = 222 - rodTop + 94 * state.insertion / 100;
+    [84.5, 108.5, 132.5].forEach(x => {
+      content += `<rect data-rod="true" x="${x}" y="${rodTop}" width="5" height="${rodLength.toFixed(1)}" fill="#2f3f4f"/>`;
+    });
+    const neutronCount = state.fissionRate > 0 ? Math.round(2 + 16 * state.fissionRate / 100) : 0;
+    for (let i = 0; i < neutronCount; i++) {
+      const x = 80 + ((i * 0.7549 + 0.1) % 1) * 72;
+      const y = 234 + ((i * 0.5698 + 0.3) % 1) * 78;
+      content += `<circle data-neutron="true" class="neutron" style="animation-delay:-${(i * 0.23).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.8" fill="#1d6fb8" stroke="#ffffff" stroke-width=".8"/>`;
+    }
+    content += `<path data-core-heat="true" d="M 116 222 V 190" stroke="${hotColor}" stroke-width="${1 + 2 * heatShare}" marker-end="url(#arrow-heat)"/>`;
+    content += anchoredText(115, 356, 'Reaktordruck-', 12, 'middle') + anchoredText(115, 370, 'behälter', 12, 'middle');
+    content += anchoredText(245, 356, 'Dampf-', 12, 'middle') + anchoredText(245, 370, 'erzeuger', 12, 'middle');
+
+    const turbineDuration = state.turbineRunning ? Math.min(6, 0.35 / electricShare).toFixed(2) : 0;
+    const spinStyle = turbineDuration ? ` class="spin" style="--spin-duration:${turbineDuration}s"` : '';
+    content += '<polygon points="378,172 458,152 458,228 378,208" fill="#a9bccd" stroke="#4f6478" stroke-width="3"/>';
+    content += `<g${spinStyle}>${[0, 30, 60, 90, 120, 150].map(angle => {
+      const dx = Math.cos(angle * Math.PI / 180) * 26;
+      const dy = Math.sin(angle * Math.PI / 180) * 26;
+      return `<line x1="${(418 - dx).toFixed(1)}" y1="${(190 - dy).toFixed(1)}" x2="${(418 + dx).toFixed(1)}" y2="${(190 + dy).toFixed(1)}" stroke="#4f6478" stroke-width="3"/>`;
+    }).join('')}</g>`;
+    content += anchoredText(404, 250, 'Turbine', 13, 'middle');
+    content += '<path d="M 458 190 H 515" stroke="#6b7785" stroke-width="6"/>';
+    content += `<circle cx="545" cy="190" r="30" fill="${mixColor('#e3ece4', '#8fd19e', electricShare)}" stroke="#39794c" stroke-width="3"/>`;
+    content += `<g${spinStyle}><rect x="531" y="184" width="28" height="12" rx="3" fill="#39794c"/></g>`;
+    content += anchoredText(545, 240, 'Generator', 13, 'middle');
+    content += pipe('M 545 160 V 52 H 612', state.turbineRunning ? '#e0a800' : '#c7ccd1', 2 + 5 * electricShare, state.turbineRunning ? electricShare : 0);
+    content += anchoredText(578, 44, state.turbineRunning ? `Strom ≈ ${state.electric} %` : 'kein Strom', 12, 'middle', 700);
+    content += '<path d="M 608 118 L 620 30 L 632 118 M 604 52 H 636 M 608 74 H 632 M 612 90 L 628 110 M 628 90 L 612 110" stroke="#59636e" stroke-width="2" fill="none"/>';
+    content += anchoredText(660, 30, 'Netz', 12, 'middle');
+
+    content += '<rect x="380" y="282" width="110" height="58" rx="8" fill="#d6e9f2" stroke="#6c93aa" stroke-width="2"/>';
+    [298, 311, 324].forEach(y => { content += `<path d="M 384 ${y} H 486" stroke="#2f9c9c" stroke-width="3"/>`; });
+    content += anchoredText(435, 358, 'Kondensator', 12, 'middle');
+    content += anchoredText(328, 352, 'Pumpe', 10, 'middle');
+
+    content += pipe('M 490 298 H 668', mixColor('#56b3b3', '#e0794a', wasteShare), 6, wasteShare);
+    content += pipe('M 668 350 H 500 V 324 H 490', '#2f9c9c', 6, wasteShare);
+    content += anchoredText(578, 292, `Kühlwasser ca. ${state.coolingOutTemp} °C`, 11, 'middle');
+    content += anchoredText(578, 368, 'zurück ca. 20 °C', 11, 'middle');
+    content += '<path d="M 650 380 Q 672 300 660 225 L 720 225 Q 708 300 730 380 Z" fill="#dfe3e6" stroke="#7d8790" stroke-width="3"/>';
+    content += anchoredText(690, 280, 'Kühlturm', 12, 'middle');
+    [[690, 205, 1], [672, 185, 0.8], [708, 175, 0.7]].forEach(([x, y, scale], i) => {
+      const radius = (6 + 20 * wasteShare) * scale;
+      content += `<ellipse class="plume" style="animation-delay:-${i}s" cx="${x}" cy="${y - 12 * wasteShare}" rx="${radius.toFixed(1)}" ry="${(radius * 0.7).toFixed(1)}" fill="#ffffff" fill-opacity="${(0.35 + 0.5 * wasteShare).toFixed(2)}" stroke="#c3ccd4"/>`;
+    });
+
+    [[40, 272, 1], [194, 155, 2], [245, 135, 3], [418, 136, 4], [545, 128, 5], [396, 270, 6], [690, 248, 7]]
+      .forEach(([x, y, number]) => { content += stepBadge(x, y, number); });
+
+    [['Wärmeleistung', state.heat, '#e8873a'], ['Elektrische Leistung', state.electric, '#e0a800'], ['Abwärme', state.waste, '#c8553d']]
+      .forEach(([name, value, color], i) => {
+        const y = 392 + i * 24;
+        content += anchoredText(20, y + 13, name, 13);
+        content += `<rect x="170" y="${y}" width="520" height="16" rx="4" fill="#e6ebf0"/>`;
+        content += `<rect data-energy="${name}" x="170" y="${y}" width="${(5.2 * value).toFixed(1)}" height="16" rx="4" fill="${color}"/>`;
+        content += anchoredText(700, y + 13, `${value} %`, 13, 'start', 700);
+      });
+
+    const label = `Druckwasserreaktor, Regelstäbe ${state.insertion} Prozent eingefahren. Modellwerte: Spaltrate ${state.fissionRate} Prozent, Wärmeleistung ${state.heat} Prozent, elektrische Leistung ${state.electric} Prozent, Abwärme ${state.waste} Prozent. Wärmeweg: Reaktorkern, Primärkreis, Dampferzeuger, Turbine, Generator, Kondensator, Kühlturm.`;
+    return svg(content, label, 760, 470);
+  }
+  function reactorSummary(state) {
+    const chain = `Regelstäbe ${state.insertion} % eingefahren → Spaltrate ≈ ${state.fissionRate} % → Wärmeleistung ≈ ${state.heat} % → Strom ≈ ${state.electric} % + Abwärme ≈ ${state.waste} %.`;
+    if (state.fissionRate === 0) return `${chain} Die Kettenreaktion ist gestoppt, die Turbine steht. Der orange Kühlweg führt die Nachzerfallswärme an der Turbine vorbei ab (vereinfacht).`;
+    if (state.insertion === 0) return `${chain} Stäbe ganz herausgezogen: Die Stäbe absorbieren kaum Neutronen, im Modell entsteht die meiste Wärme.`;
+    return `${chain} Je tiefer die Stäbe, desto mehr Neutronen werden absorbiert und desto weniger Wärme entsteht.`;
+  }
+
   function initLab() {
     const $ = selector => document.querySelector(selector);
     const solved = new Set();
@@ -703,28 +863,10 @@
     $('#fission-step').addEventListener('input', updateFission);
     updateFission();
     function updateReactor() {
-      const insertion = Number($('#control-rods').value);
-      $('#rods-output').value = insertion;
-      const rodTop = 63;
-      const coreTop = 135;
-      const coreHeight = 52;
-      const rodLength = coreTop - rodTop + coreHeight * insertion / 100;
-      let drawing = '<rect x="25" y="60" width="115" height="150" rx="24" fill="#dbe6ed" stroke="#5a7992" stroke-width="3"/>';
-      drawing += `<rect data-core="true" x="48" y="${coreTop}" width="65" height="${coreHeight}" fill="#edb078"/>`;
-      [55, 80, 105].forEach(x => { drawing += `<rect data-rod="true" x="${x}" y="${rodTop}" width="8" height="${rodLength}" fill="#526b80"/>`; });
-      drawing += '<path d="M 140 90 H 210 V 175 H 140 M 140 185 H 190 V 200 H 140" stroke="#bd6540" stroke-width="7" fill="none"/>';
-      drawing += '<rect x="205" y="80" width="40" height="135" rx="12" fill="#e8cfb5" stroke="#91734b"/>';
-      drawing += '<path d="M 245 100 H 325 V 175 H 365 V 220 H 250 V 185" stroke="#448bb5" stroke-width="6" fill="none"/>';
-      drawing += '<path d="M 300 80 L 350 100 L 300 120 Z" fill="#94b1c8"/><circle cx="398" cy="100" r="28" fill="#b4d4b8" stroke="#39794c"/>';
-      drawing += '<path d="M 350 100 H 370 M 425 100 H 480" stroke="#556b7f" stroke-width="4"/>';
-      drawing += '<rect x="315" y="165" width="105" height="45" rx="6" fill="#c6dfeb" stroke="#7097ae"/>';
-      drawing += '<path d="M 420 180 H 500 V 235 H 420" stroke="#58a4a4" stroke-width="6" fill="none"/>';
-      drawing += text(82, 36, 'Reaktor', 16) + text(82, 240, 'Regelstäbe / Kern', 13) + text(225, 55, 'Dampferzeuger', 13);
-      drawing += text(315, 55, 'Turbine', 14) + text(399, 55, 'Generator', 14) + text(490, 100, 'Strom →', 14);
-      drawing += text(366, 155, 'Kondensator', 13) + text(486, 263, 'Kühlkreislauf', 13);
-      drawing += text(175, 285, 'Primärkreis: warm', 13) + text(365, 285, 'Sekundärkreis: Dampf/Wasser', 13);
-      $('#reactor-picture').innerHTML = svg(drawing, `Druckwasserreaktor mit ${insertion} Prozent eingefahrenen Regelstäben, getrennten Wasserkreisläufen, Turbine, Generator und Kondensator.`, 570, 310);
-      $('#power-text').textContent = `Regelstäbe ${insertion} % eingefahren: ${insertion === 0 ? 'keine Absorption durch diese Stäbe dargestellt' : insertion === 100 ? 'größte dargestellte Absorption durch die Stäbe' : 'mehr eingefahren bedeutet mehr Neutronenabsorption'}. Die Stellung ist kein Prozentwert der Kraftwerksleistung.`;
+      const state = reactorState(Number($('#control-rods').value));
+      $('#rods-output').value = state.insertion;
+      $('#reactor-picture').innerHTML = reactorDrawing(state);
+      $('#power-text').textContent = reactorSummary(state);
     }
     $('#control-rods').addEventListener('input', updateReactor);
     updateReactor();
@@ -791,7 +933,7 @@
     module.exports = {
       atomInfo, atomDrawing, shellDistribution, simulateDecay, expectedRemaining, relativeExposure,
       chainGenerations, uraniumSeries, fissionReaction, fissionDrawing, shieldDrawing,
-      questions, finalTasks, gradeQuestion, models
+      reactorState, reactorDrawing, reactorSummary, questions, finalTasks, gradeQuestion, models
     };
   }
   if (typeof document !== 'undefined') initLab();

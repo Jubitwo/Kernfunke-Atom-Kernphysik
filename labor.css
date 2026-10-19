@@ -32,8 +32,27 @@ th, td { border-bottom: 1px solid var(--line); text-align: left; padding: .5rem;
 summary { cursor: pointer; font-weight: 700; padding: .6rem 0; }
 summary:focus-visible { outline: 3px solid #e5a51b; outline-offset: 3px; }
 details { margin: .8rem 0; }
-.reactor { align-items: start; }
-.reactor .figure svg { min-height: 240px; }
+.reactor { align-items: start; grid-template-columns: minmax(0, 1.8fr) minmax(250px, 1fr); }
+.reactor .figure svg { min-height: 240px; max-width: none; }
+.reactor-legend { list-style: none; display: flex; flex-wrap: wrap; gap: .3rem 1rem; padding: 0; margin: .3rem 0 .6rem; }
+.reactor-legend li { display: flex; align-items: center; gap: .35rem; }
+.reactor-legend span { width: 1.4rem; height: .45rem; border-radius: 99px; background: var(--swatch); }
+.reactor-legend span.dot { width: .6rem; height: .6rem; background: #1d6fb8; }
+.heat-path li { margin-bottom: .35rem; }
+#reactor-picture .flow { stroke-dasharray: 6 12; animation: reactor-flow var(--flow-duration, 2s) linear infinite; }
+#reactor-picture .spin { transform-box: fill-box; transform-origin: center; animation: reactor-spin var(--spin-duration, 1s) linear infinite; }
+#reactor-picture .neutron { animation: reactor-blink 1.1s ease-in-out infinite alternate; }
+#reactor-picture .bubble { animation: reactor-bubble 2.4s ease-in infinite; }
+#reactor-picture .plume { transform-box: fill-box; transform-origin: center; animation: reactor-plume 4s ease-in-out infinite alternate; }
+@keyframes reactor-flow { to { stroke-dashoffset: -36; } }
+@keyframes reactor-spin { to { transform: rotate(360deg); } }
+@keyframes reactor-blink { from { opacity: .35; } to { opacity: 1; } }
+@keyframes reactor-bubble { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
+@keyframes reactor-plume { from { transform: translateY(0) scale(1); } to { transform: translateY(-6px) scale(1.08); } }
+@media (max-width: 850px) { .reactor { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  #reactor-picture .flow, #reactor-picture .spin, #reactor-picture .neutron, #reactor-picture .bubble, #reactor-picture .plume { animation: none; }
+}
 .tabs button { overflow-wrap: anywhere; }
 .controls label { min-width: 0; flex: 1 1 150px; }
 .timeline { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }

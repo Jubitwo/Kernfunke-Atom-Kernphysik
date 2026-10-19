@@ -202,3 +202,34 @@ test('Abschlusstest enthält 14 Grundaufgaben, einen freiwilligen Zusatz und get
   assert.match(html, /id="final-test"/);
   assert.match(html, /id="test-solutions"/);
 });
+
+test('Kraftwerk: Regelstäbe steuern Spaltrate, Wärme, Strom und Abwärme konsistent', () => {
+  const { reactorState, reactorDrawing } = require('./labor.js');
+  let previous = null;
+  for (let insertion = 0; insertion <= 100; insertion += 10) {
+    const state = reactorState(insertion);
+    assert.equal(state.fissionRate, 100 - insertion);
+    assert.equal(state.electric + state.waste, state.heat);
+    if (previous) {
+      assert.ok(state.heat < previous.heat, 'tiefere Stäbe → weniger Wärme');
+      assert.ok(state.electric <= previous.electric);
+    }
+    previous = state;
+    const drawing = reactorDrawing(state);
+    assert.equal((drawing.match(/data-rod="true"/g) || []).length, 3);
+    for (let step = 1; step <= 7; step++) assert.match(drawing, new RegExp(`data-heat-step="${step}"`));
+    assert.match(drawing, /role="img" aria-label=/);
+  }
+  assert.deepEqual([reactorState(0).heat, reactorState(0).electric, reactorState(0).waste], [100, 33, 67]);
+  const shutdown = reactorState(100);
+  assert.equal(shutdown.heat, 5, 'Nachzerfallswärme bleibt');
+  assert.equal(shutdown.electric, 0);
+  assert.equal(shutdown.turbineRunning, false);
+  assert.equal((reactorDrawing(shutdown).match(/data-neutron="true"/g) || []).length, 0);
+  assert.match(reactorDrawing(shutdown), /data-core-heat="true"/);
+  assert.match(reactorDrawing(shutdown), /data-cooling-bypass="true"/);
+  assert.doesNotMatch(reactorDrawing(shutdown), /class="spin"/);
+  assert.doesNotMatch(reactorDrawing(reactorState(0)), /data-cooling-bypass="true"/);
+  assert.ok((reactorDrawing(reactorState(0)).match(/data-neutron="true"/g) || []).length > (reactorDrawing(reactorState(70)).match(/data-neutron="true"/g) || []).length);
+  for (const bad of [-1, 101, NaN]) assert.throws(() => reactorState(bad), RangeError);
+});
