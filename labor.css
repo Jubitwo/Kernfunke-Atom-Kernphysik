@@ -1,8 +1,10 @@
+@charset "UTF-8";
 body { --display: "Avenir Next", "Segoe UI", system-ui, sans-serif; --body: system-ui, -apple-system, sans-serif; }
 [hidden] { display: none !important; }
 figure { margin: 1rem 0; min-width: 0; }
 figcaption, .hint { color: var(--muted); font-size: .93rem; }
 button, select, input:not([type="radio"]) { min-height: 44px; }
+select { max-width: 100%; }
 input[type="range"] { display: block; width: 100%; accent-color: var(--blue); }
 input[type="number"] { max-width: 12rem; }
 textarea { width: 100%; padding: .7rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
@@ -35,7 +37,21 @@ details { margin: .8rem 0; }
 .tabs button { overflow-wrap: anywhere; }
 .controls label { min-width: 0; flex: 1 1 150px; }
 .timeline { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+.tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.reading-guide { border-left: 4px solid var(--blue); padding: 1rem 1rem 1rem 2.2rem; background: var(--blue-soft); }
+.equation { font-weight: 700; font-size: clamp(1rem, 2.5vw, 1.3rem); padding: .8rem; background: var(--violet-soft); border-radius: 8px; }
+tr[aria-current="true"] { background: var(--violet-soft); font-weight: 700; }
+.station-next { text-align: right; margin-top: 1.5rem; }
+.print-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0; }
+.print-document { margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--line); border-radius: 10px; overflow-wrap: anywhere; }
+.study-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.study-grid section { min-width: 0; padding: .8rem; background: #f5f8fc; border-radius: 8px; }
+.study-grid h4 { margin-top: 0; }
+.final-task, .final-solution { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: .5rem; }
+.written-answer { display: none; }
 @media (max-width: 520px) {
+  .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .study-grid { grid-template-columns: minmax(0, 1fr); }
   .figure svg { min-width: 540px; }
   .figure::after { content: "Bild horizontal verschiebbar ↔"; display: block; color: var(--muted); font-size: .85rem; padding: .3rem; }
   .figure:empty::after { content: none; }
@@ -45,7 +61,7 @@ details { margin: .8rem 0; }
   .hero { background: white; color: black; padding: 1rem; }
   .hero .tag { border-color: #555; }
   .wrap { width: 100%; margin: 0; }
-  .tabs, .toc, .skip, button, #learning-progress, footer { display: none !important; }
+  .tabs, .toc, .skip, button, #learning-progress, footer, .no-print, .print-actions { display: none !important; }
   .panel[hidden] { display: block !important; }
   .station { box-shadow: none; break-before: page; }
   .card, .experiment, fieldset { break-inside: avoid; }
@@ -53,4 +69,27 @@ details { margin: .8rem 0; }
   .figure svg { min-width: 0; max-width: 500px; }
   .figure::after { display: none; }
   textarea { min-height: 5rem; }
+  #test-solutions { display: none; }
+  .print-document { border: none; margin: 0; padding: 0; }
+  .study-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem 1rem; font-size: 9.5pt; }
+  .study-grid section, .final-task, .final-solution { break-inside: avoid; }
+  .study-grid section { padding: .3rem; background: white; }
+  .final-task textarea { display: none; }
+  .written-answer { display: block; min-height: 5rem; border-bottom: 1px solid #82909f; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .drawing-answer { min-height: 8rem; }
+  #final-test, #study-sheet { break-before: page; }
+  body[data-print-mode="sheet"] .hero, body[data-print-mode="test"] .hero, body[data-print-mode="solutions"] .hero { display: none; }
+  body[data-print-mode="sheet"] main > :not(#station9),
+  body[data-print-mode="test"] main > :not(#station9),
+  body[data-print-mode="solutions"] main > :not(#station9) { display: none !important; }
+  body[data-print-mode="sheet"] #station9,
+  body[data-print-mode="test"] #station9,
+  body[data-print-mode="solutions"] #station9 { display: block !important; break-before: auto; border: none; padding: 0; }
+  body[data-print-mode="sheet"] #station9 > :not(#study-sheet),
+  body[data-print-mode="test"] #station9 > :not(#final-test),
+  body[data-print-mode="solutions"] #station9 > :not(#test-solutions) { display: none !important; }
+  body[data-print-mode="solutions"] #test-solutions { display: block; }
+  body[data-print-mode="sheet"] #study-sheet,
+  body[data-print-mode="test"] #final-test { break-before: auto; }
+  @page { margin: 15mm; }
 }

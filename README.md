@@ -12,8 +12,8 @@ Interaktive Lernstrecke für die Realschule Baden-Württemberg (Klasse 10, M-Niv
 
 | Datei | Zweck |
 |---|---|
-| [index.html](./index.html) | Interaktive Lernstrecke mit sechs Stationen |
-| [labor.js](./labor.js) | Modelle, Visualisierungen und 22 Auswahlaufgaben mit Erklärungen |
+| [index.html](./index.html) | Interaktive Lernstrecke mit neun Stationen |
+| [labor.js](./labor.js) | Modelle, Visualisierungen, 36 Auswahlaufgaben und Abschlusstest |
 | [labor.css](./labor.css) | Ergänzende Gestaltung und Druckansicht |
 | [labor.test.cjs](./labor.test.cjs) | Tests der Physikmodelle, Aufgaben und Verdrahtung |
 | [docs/README.md](./docs/README.md) | Lehrplanbezug, Unterrichtsvorschlag, Sicherheit und Pflege |
@@ -21,19 +21,24 @@ Interaktive Lernstrecke für die Realschule Baden-Württemberg (Klasse 10, M-Niv
 ## Lernstrecke
 
 1. **Atomdetektive:** Fünf Atommodelle von Demokrit über Thomson bis Bohr vergleichen; Rutherfords Streuversuch auswerten.
-2. **Baumeister:** Protonen, Neutronen und Elektronen zählen; Isotope und Ionen bilden. Die Grafik zeigt die tatsächlich gewählten Teilchenzahlen.
-3. **Strahlungsfinder:** Alpha-, Beta- und Gammastrahlung sowie Kernänderungen unterscheiden; Abschirmung virtuell untersuchen. Ionisation, Zellschäden, Kontamination, medizinische Anwendungen und Strahlenschutz kennenlernen. Abstand und Zeit relativ vergleichen.
-4. **Messlabor:** Zufälligen Kernzerfall mit theoretischem Erwartungswert und Datentabelle vergleichen. Halbwertszeit berechnen, Nullrate und Geiger-Müller-Zählrohr verstehen. Aktivität (Bq) und Dosis (Sv) unterscheiden.
-5. **Kernspaltung:** Spaltung in drei Bildschritten, abklingende/gleichbleibende/anwachsende Kettenreaktion und ein Druckwasserreaktor mit getrennten Kreisläufen. Regelstäbe bewegen, Nachzerfallswärme und radioaktive Abfälle einordnen.
-6. **Geschichte & Verantwortung:** Becquerel, Marie und Pierre Curie, Hahn, Straßmann, Meitner und Frisch historisch einordnen. Kernwaffenfolgen sowie Nutzen und Risiken bewerten.
+2. **Baumeister:** Bohr-Schalen statt einer einzigen Elektronenebene. Für neutrale Atome der ersten 20 Elemente: Besetzungsfolge 2 | 8 | 8 | 2, mit C-, Na- und Ca-Beispielen. Isotope und Ionen bilden; jede gewählte Teilchenzahl wird tatsächlich gezeichnet.
+3. **Strahlungsfinder:** Beschriftete, unterschiedlich gestaltete Schichten Papier → zusätzlich Aluminium → zusätzlich Blei. Gamma-Abschwächung durch wenige weiterlaufende Beispielspuren verstehen. Ionisation, Zellschäden, Kontamination, Anwendungen und Schutz; Abstand/Zeit anhand von 100 Modelltreffern vergleichen.
+4. **Messlabor:** 1 Messschritt = 1 Sekunde. Halbwertszeit in Sekunden, Zeitmarke zum Ablesen, 200 Kernpunkte, Zufallskurve, Erwartungswert und Datentabelle. Nullrate, Zählrohr und Unterschied Bq/Sv.
+5. **Kernspaltung:** U-235 + n → U-236* → Ba-141 + Kr-92 + 3 n, mit Teilchenbildern und A-/Z-Bilanz. Exponentielles Wachstum bei Faktor 2 je Generation klar von gleichbleibenden und abklingenden Kettenreaktionen unterscheiden. Die natürliche U-238-Zerfallsreihe bis Pb-206 separat bilanzieren (8 α, 6 β⁻).
+6. **Kernenergie & Kraftwerk:** Eigene Station mit Druckwasserreaktor, getrennten Kreisläufen, Regelstäben, Energieumwandlung, Nachzerfallswärme und Abfällen.
+7. **Kernwaffen & Verantwortung:** Kontrollierte Nutzung und zerstörerische Energiefreisetzung unterscheiden. Kurzer zusätzlicher Hinweis auf Fusion und Wasserstoffbombe, ausschließlich auf Prinzipienebene.
+8. **Geschichte:** Becquerel, Marie und Pierre Curie, Hahn, Straßmann, Meitner und Frisch historisch einordnen, mit erweiterten Fragen.
+9. **Lernzettel & Abschlusstest:** Merkwissen, Selbstcheck, 14 offene Grundaufgaben und ein freiwilliger Zusatz. Lernzettel, Test ohne Lösungen und Vergleichslösungen sind einzeln druckbar.
 
-22 Auswahlaufgaben, eine Zahlenaufgabe und eine Einstellaufgabe bieten automatische Rückmeldung. Schriftliche Forscheraufträge, ein sicheres Münzexperiment und freie Bewertungsaufgaben ergänzen die Lernstrecke. Freitext wird anhand von Vergleichskriterien selbst geprüft, nicht automatisch benotet.
+36 Auswahlaufgaben, eine Zahlenaufgabe und eine Einstellaufgabe bieten automatische Rückmeldung (38 Lernchecks). Schriftliche Forscheraufträge, ein sicheres Münzexperiment und freie Bewertungsaufgaben ergänzen die Lernstrecke. Der separate Abschlusstest wird anhand von Vergleichskriterien selbst geprüft, nicht automatisch benotet.
 
 ## Lokal starten
 
 Es werden keine Pakete und kein Build-Schritt benötigt. Den gesamten Ordner herunterladen und [index.html](./index.html) direkt in einem aktuellen Browser öffnen. Alle Funktionen und Schriftarten arbeiten ohne Internet; nur die weiterführenden Quellenlinks benötigen eine Verbindung.
 
-Die Inhaltslinks, Stationsreiter und Browser-Zurück funktionieren zusammen. Die Reiter unterstützen Pfeiltasten sowie Pos1/Ende. Die Druckansicht zeigt alle Stationen. Antworten und Fortschritt werden nicht gespeichert oder übertragen und gehen beim Neuladen verloren. Es gibt keine Werbung, Analysewerkzeuge oder extern geladenen Schriftarten.
+Die Inhaltslinks, Stationsreiter und Browser-Zurück funktionieren zusammen. Die Reiter unterstützen Pfeiltasten sowie Pos1/Ende. „Gesamtes Labor drucken“ zeigt alle neun Stationen ohne Lösungsanhang. Station 9 bietet zusätzlich drei gezielte Druckschaltflächen. Eingetippte Abschlusstest-Antworten werden mitgedruckt, ansonsten erscheint Schreibraum. Antworten und Fortschritt werden nicht gespeichert oder übertragen und gehen beim Neuladen verloren. Es gibt keine Werbung, Analysewerkzeuge oder extern geladenen Schriftarten.
+
+**Geänderte Direktlinks:** Station 6 ist jetzt Kernenergie, Station 7 Kernwaffen, Station 8 Geschichte und Station 9 Lernzettel/Test. Ein alter Link auf `#station6` öffnet deshalb jetzt die Kraftwerksstation.
 
 ## Prüfen
 
