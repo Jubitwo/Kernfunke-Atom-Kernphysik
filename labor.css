@@ -1,0 +1,56 @@
+body { --display: "Avenir Next", "Segoe UI", system-ui, sans-serif; --body: system-ui, -apple-system, sans-serif; }
+[hidden] { display: none !important; }
+figure { margin: 1rem 0; min-width: 0; }
+figcaption, .hint { color: var(--muted); font-size: .93rem; }
+button, select, input:not([type="radio"]) { min-height: 44px; }
+input[type="range"] { display: block; width: 100%; accent-color: var(--blue); }
+input[type="number"] { max-width: 12rem; }
+textarea { width: 100%; padding: .7rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+textarea:focus-visible { outline: 3px solid #e5a51b; outline-offset: 3px; }
+.skip { position: absolute; left: 1rem; top: -5rem; padding: .6rem; background: white; z-index: 10; }
+.skip:focus { top: .5rem; }
+.figure svg { display: block; width: 100%; height: auto; max-width: 720px; margin: .5rem auto; background: #f4f8fc; border-radius: 12px; }
+.figure { overflow-x: auto; }
+.figure:focus-visible { outline: 3px solid #e5a51b; outline-offset: 3px; }
+.figure svg text { font-family: system-ui, sans-serif; fill: #172235; }
+.model-row { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.experiment { padding: 1rem; margin: 1.2rem 0; border: 2px solid #96bbd5; border-radius: 12px; background: #f5faff; }
+.experiment h3 { margin-top: 0; }
+.paper-task { border-left: 4px solid var(--violet); padding: .8rem 1rem; background: var(--violet-soft); }
+.quiz { margin: 1rem 0; }
+.quiz fieldset { margin: 0; padding: 1rem; border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.quiz legend { padding: .2rem .5rem; font-weight: 700; }
+.quiz label { display: block; margin: .4rem 0; cursor: pointer; }
+.quiz .feedback { font-weight: 500; }
+.numeric-task { display: grid; justify-items: start; gap: .6rem; padding: 1rem; border: 1px solid var(--line); border-radius: 10px; }
+.numeric-task input { padding: .5rem; border: 1px solid var(--line); border-radius: 6px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); text-align: left; padding: .5rem; }
+summary { cursor: pointer; font-weight: 700; padding: .6rem 0; }
+summary:focus-visible { outline: 3px solid #e5a51b; outline-offset: 3px; }
+details { margin: .8rem 0; }
+.reactor { align-items: start; }
+.reactor .figure svg { min-height: 240px; }
+.tabs button { overflow-wrap: anywhere; }
+.controls label { min-width: 0; flex: 1 1 150px; }
+.timeline { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+@media (max-width: 520px) {
+  .figure svg { min-width: 540px; }
+  .figure::after { content: "Bild horizontal verschiebbar ↔"; display: block; color: var(--muted); font-size: .85rem; padding: .3rem; }
+  .figure:empty::after { content: none; }
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .hero { background: white; color: black; padding: 1rem; }
+  .hero .tag { border-color: #555; }
+  .wrap { width: 100%; margin: 0; }
+  .tabs, .toc, .skip, button, #learning-progress, footer { display: none !important; }
+  .panel[hidden] { display: block !important; }
+  .station { box-shadow: none; break-before: page; }
+  .card, .experiment, fieldset { break-inside: avoid; }
+  .grid, .reactor { display: block; }
+  .figure svg { min-width: 0; max-width: 500px; }
+  .figure::after { display: none; }
+  textarea { min-height: 5rem; }
+}
