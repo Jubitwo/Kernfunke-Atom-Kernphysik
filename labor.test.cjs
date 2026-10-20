@@ -5,7 +5,8 @@ const path = require('node:path');
 const {
   atomInfo, atomDrawing, simulateDecay, expectedRemaining, relativeExposure,
   chainGenerations, questions, gradeQuestion, models, shellDistribution,
-  uraniumSeries, fissionReaction, fissionDrawing, shieldDrawing, finalTasks
+  uraniumSeries, fissionReaction, fissionDrawing, shieldDrawing, finalTasks,
+  fissionDecayChains, idealChain, chainTreeDrawing, bombDrawing, bombSteps
 } = require('./labor.js');
 
 test('Atome, Isotope und Ionen: Element, A und Ladung bleiben konsistent', () => {
@@ -134,7 +135,58 @@ test('Spaltungsbeispiel erhält A und Z und zeichnet alle Kernteilchen und freie
   assert.equal(counts(result, /data-free-neutron=/g), 3);
   assert.match(result, /data-nucleus="Ba-141"/);
   assert.match(result, /data-nucleus="Kr-92"/);
-  assert.throws(() => fissionDrawing(3), RangeError);
+  assert.throws(() => fissionDrawing(7), RangeError);
+});
+
+test('Spaltprodukte zerfallen per β⁻ bis zu stabilen Kernen; die Bildschritte zeigen jeden Zerfall', () => {
+  assert.deepEqual(fissionDecayChains.map(chain => chain.nuclides[0].symbol + '-' + chain.nuclides[0].mass),
+    fissionReaction.products.map(product => product.symbol + '-' + product.mass));
+  for (const chain of fissionDecayChains) {
+    chain.nuclides.slice(1).forEach((nuclide, index) => {
+      const parent = chain.nuclides[index];
+      assert.equal(nuclide.mass, parent.mass);
+      assert.equal(nuclide.charge, parent.charge + 1);
+      assert.ok(parent.halfLife);
+    });
+    assert.equal(chain.nuclides.at(-1).halfLife, null);
+  }
+  assert.deepEqual(fissionDecayChains.map(chain => chain.nuclides.at(-1).symbol), ['Pr', 'Zr']);
+  const counts = (drawing, pattern) => (drawing.match(pattern) || []).length;
+  [3, 4, 5, 6].forEach((step, index) => {
+    const drawing = fissionDrawing(step);
+    assert.equal(counts(drawing, /data-emitted-electron=/g), index === 0 ? 2 : index === 1 ? 4 : index === 2 ? 6 : 7);
+  });
+  const final = fissionDrawing(6);
+  assert.match(final, /data-nuclide="Pr-141" data-stable="true" data-current="true"/);
+  assert.match(final, /data-nuclide="Zr-92" data-stable="true" data-current="true"/);
+  assert.equal(counts(final, /data-stable="false" data-current="true"/g), 0);
+});
+
+test('Kettenreaktion im Bild wächst idealisiert 1 → 3 → 9 → 27 und zeigt den Kraftwerksfall', () => {
+  assert.deepEqual(idealChain(5), [1, 3, 9, 27, 81]);
+  const counts = (drawing, pattern) => (drawing.match(pattern) || []).length;
+  [0, 1, 2, 3].forEach(step => {
+    const drawing = chainTreeDrawing(step);
+    assert.equal(counts(drawing, /data-fission=/g), idealChain(step + 1).reduce((a, b) => a + b, 0));
+    assert.equal(counts(drawing, /data-waiting=/g), step < 3 ? 3 ** (step + 1) : 0);
+  });
+  assert.equal(counts(chainTreeDrawing(4), /data-fission=/g), 4);
+  assert.throws(() => chainTreeDrawing(5), RangeError);
+});
+
+test('Bombenschemata: je vier Bildschritte mit Prinzip, ohne ungültige Typen', () => {
+  for (const type of ['gun', 'implosion', 'hydrogen']) {
+    assert.equal(bombSteps[type].length, 4);
+    for (let step = 0; step < 4; step++) {
+      const drawing = bombDrawing(type, step);
+      assert.match(drawing, /^<svg/);
+      assert.match(drawing, /keine Maße, Mengen oder Bauanleitung/);
+    }
+    assert.match(bombDrawing(type, 3), /data-burst=/);
+  }
+  assert.match(bombDrawing('gun', 3), /data-consequence=/);
+  assert.throws(() => bombDrawing('gun', 4), RangeError);
+  assert.throws(() => bombDrawing('reactor', 0), RangeError);
 });
 
 test('Jeder Schritt der Uran-Radium-Reihe erfüllt die Alpha- oder Beta-Bilanz', () => {
@@ -149,8 +201,8 @@ test('Jeder Schritt der Uran-Radium-Reihe erfüllt die Alpha- oder Beta-Bilanz',
   assert.deepEqual(uraniumSeries.at(-1), { symbol: 'Pb', mass: 206, charge: 82, decay: null });
 });
 
-test('Alle 36 Auswahlaufgaben haben genau eine richtige Option und eine fachliche Erklärung', () => {
-  assert.equal(questions.length, 36);
+test('Alle 45 Auswahlaufgaben haben genau eine richtige Option und eine fachliche Erklärung', () => {
+  assert.equal(questions.length, 45);
   assert.equal(new Set(questions.map(q => q.id)).size, questions.length);
   for (const question of questions) {
     assert.ok(question.prompt.trim());
@@ -181,10 +233,14 @@ test('Alle Stationen, Bedienelemente, Dateien und Modellbezeichnungen sind verdr
   assert.doesNotMatch(html, /fonts\.googleapis\.com/);
   assert.match(script, /addEventListener\('hashchange'/);
   assert.match(script, /ArrowRight/);
+  assert.match(script, /data-half-marker="\$\{multiple\}" d="[^"]*" fill="none"/);
+  assert.doesNotMatch(html, /id="fission-step"/);
+  for (const id of ['fission-steps', 'chain-steps', 'abomb-steps', 'hbomb-steps', 'chain-tree', 'abomb-picture', 'hbomb-picture']) assert.match(html, new RegExp(`id="${id}"`));
+  for (const event of ['1986 · Tschernobyl', '2011 · Fukushima']) assert.ok(html.includes(event));
 });
 
-test('Abschlusstest enthält 14 Grundaufgaben, einen freiwilligen Zusatz und getrennte Lösungen', () => {
-  assert.equal(finalTasks.length, 15);
+test('Abschlusstest enthält 18 Grundaufgaben, einen freiwilligen Zusatz und getrennte Lösungen', () => {
+  assert.equal(finalTasks.length, 19);
   assert.equal(finalTasks.filter(task => task.optional).length, 1);
   assert.equal(new Set(finalTasks.map(task => task.id)).size, finalTasks.length);
   for (const task of finalTasks) {

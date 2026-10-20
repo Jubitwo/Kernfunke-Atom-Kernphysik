@@ -90,6 +90,24 @@
     products: [{ symbol: 'Ba', mass: 141, charge: 56 }, { symbol: 'Kr', mass: 92, charge: 36 }],
     neutrons: 3
   };
+  const fissionDecayChains = [
+    { id: 'barium', title: 'Barium-Reihe · A = 141', nuclides: [
+      { symbol: 'Ba', mass: 141, charge: 56, halfLife: '18 min' },
+      { symbol: 'La', mass: 141, charge: 57, halfLife: '3,9 h' },
+      { symbol: 'Ce', mass: 141, charge: 58, halfLife: '32,5 d' },
+      { symbol: 'Pr', mass: 141, charge: 59, halfLife: null }
+    ] },
+    { id: 'krypton', title: 'Krypton-Reihe · A = 92', nuclides: [
+      { symbol: 'Kr', mass: 92, charge: 36, halfLife: '1,8 s' },
+      { symbol: 'Rb', mass: 92, charge: 37, halfLife: '4,5 s' },
+      { symbol: 'Sr', mass: 92, charge: 38, halfLife: '2,7 h' },
+      { symbol: 'Y', mass: 92, charge: 39, halfLife: '3,5 h' },
+      { symbol: 'Zr', mass: 92, charge: 40, halfLife: null }
+    ] }
+  ];
+  function idealChain(generations = 5, factor = 3) {
+    return Array.from({ length: generations }, (_, generation) => factor ** generation);
+  }
 
   const questions = [
     { id: 'rutherford', group: 'models', prompt: 'Was folgerte Rutherford aus den seltenen starken Ablenkungen?',
@@ -185,6 +203,15 @@
     { id: 'uranium-lead', group: 'fission', prompt: 'Wie führt der Hauptpfad von U-238 (Z = 92) zu Pb-206 (Z = 82)?',
       options: ['Durch 8 α- und 6 β⁻-Zerfälle.', 'Durch eine einzige Spaltung in Blei.', 'Durch 6 α- und 8 β⁻-Zerfälle.'], answer: 0,
       explanation: '8 α reduzieren A um 32 und Z um 16 auf 76. 6 β⁻ erhöhen Z auf 82. Das ist eine Zerfallsreihe, keine sich vervielfachende Kettenreaktion.' },
+    { id: 'chain-three', group: 'fission', prompt: 'Idealfall: Jede Spaltung löst 3 weitere aus. Wie viele Spaltungen gibt es in Generation g = 3?',
+      options: ['9', '12', '27'], answer: 2,
+      explanation: '1 → 3 → 9 → 27: In jeder Generation wird mit 3 multipliziert, also 3³ = 27. 3 · 3 = 9 wäre erst g = 2; 3 + 3 + 3 + 3 = 12 wäre lineares Denken.' },
+    { id: 'fission-products', group: 'fission', prompt: 'Was geschieht mit dem Spaltprodukt Ba-141?',
+      options: ['Es wandelt sich über mehrere β⁻-Zerfälle bis zum stabilen Pr-141 um.', 'Es ist sofort stabil.', 'Es spaltet sich wieder in zwei gleich große Kerne.'], answer: 0,
+      explanation: 'Ba-141 hat zu viele Neutronen. Über La-141 und Ce-141 entsteht nach drei β⁻-Zerfällen das stabile Pr-141. A bleibt 141, Z steigt von 56 auf 59.' },
+    { id: 'beta-count', group: 'fission', prompt: 'Kr-92 (Z = 36) wird zum stabilen Zr-92 (Z = 40). Wie viele β⁻-Zerfälle sind nötig?',
+      options: ['2', '4', '40'], answer: 1,
+      explanation: 'Jeder β⁻-Zerfall erhöht Z um 1 und lässt A gleich: 40 − 36 = 4 Zerfälle (Kr → Rb → Sr → Y → Zr).' },
     { id: 'reactor-circuits', group: 'energy', prompt: 'Was wird im Dampferzeuger eines Druckwasserreaktors zwischen den Kreisläufen übertragen?',
       options: ['Das gesamte Primärwasser.', 'Wärme; das Wasser bleibt getrennt.', 'Die Brennelemente.'], answer: 1,
       explanation: 'Der Dampferzeuger ist ein Wärmetauscher: Primärwasser gibt Wärme an Sekundärwasser ab, ohne dass beide Wasserströme vermischt werden.' },
@@ -194,12 +221,30 @@
     { id: 'weapon-reactor', group: 'weapons', prompt: 'Was unterscheidet den stationären Reaktorbetrieb von einer Spaltungswaffe?',
       options: ['Geregelte, im Mittel gleichbleibende Kettenreaktion statt sehr schneller zerstörerischer Energiefreisetzung.', 'Ein Reaktorunfall ist immer eine Kernwaffenexplosion.', 'Im Reaktor gibt es keine Kernreaktionen.'], answer: 0,
       explanation: 'Zweck, physikalische Situation und Folgen unterscheiden sich. Ein schwerer Reaktorunfall ist nicht mit einer Kernwaffenexplosion gleichzusetzen.' },
+    { id: 'supercritical', group: 'weapons', prompt: 'Was bedeutet „überkritisch“?',
+      options: ['Es finden überhaupt keine Spaltungen statt.', 'Jede Spaltung löst im Mittel mehr als eine weitere aus; die Kettenreaktion wächst.', 'Das Material ist besonders kalt.'], answer: 1,
+      explanation: 'Unterkritisch: Faktor kleiner 1, die Kettenreaktion erlischt. Kritisch: Faktor 1, gleichbleibend wie im Kraftwerk. Überkritisch: Faktor größer 1, exponentielles Wachstum.' },
+    { id: 'bomb-ignition', group: 'weapons', prompt: 'Wie wird eine Atombombe im Prinzip ausgelöst?',
+      options: ['Regelstäbe werden langsam herausgezogen.', 'Wasser wird erhitzt, bis Dampf entsteht.', 'Konventioneller Sprengstoff bringt unterkritisches Material sehr schnell in einen überkritischen Zustand.'], answer: 2,
+      explanation: 'Beim Kanonenprinzip werden zwei Teilmassen zusammengeschoben, beim Implosionsprinzip wird eine Kugel zusammengepresst. In beiden Fällen entsteht schlagartig ein überkritischer Zustand.' },
+    { id: 'hbomb-stages', group: 'weapons', prompt: 'Was zündet die Fusionsstufe einer Wasserstoffbombe?',
+      options: ['Die Explosion einer Spaltungsstufe liefert extreme Hitze und Strahlung.', 'Ein elektrischer Funke wie im Automotor.', 'Sonnenlicht, das durch die Hülle fällt.'], answer: 0,
+      explanation: 'Fusion braucht viele Millionen Grad und hohen Druck. Diese Bedingungen erzeugt zuerst eine Spaltungsexplosion; deshalb besteht eine Wasserstoffbombe aus zwei Stufen.' },
     { id: 'becquerel-finding', group: 'history', prompt: 'Was machte Becquerels Beobachtung besonders?',
       options: ['Uran musste zuerst mit Sonnenlicht aufgeladen werden.', 'Uranverbindungen schwärzten eine geschützte Fotoplatte auch ohne vorherige Beleuchtung.', 'Er beobachtete bereits eine Kernspaltung.'], answer: 1,
       explanation: 'Die Wirkung ging von den Uranverbindungen selbst aus. 1896 wurde damit natürliche Radioaktivität erkannt, nicht Kernspaltung.' },
     { id: 'discovery-date', group: 'history', prompt: 'Welche zeitliche Reihenfolge passt zur Kernspaltung?',
       options: ['1939 Deutung, erst 1945 Barium-Befund.', '1896 fand Hahn Barium.', 'Ende 1938 Barium-Befund; Anfang 1939 Veröffentlichung und physikalische Deutung.'], answer: 2,
-      explanation: 'Der experimentelle Befund von Hahn/Straßmann und die Deutung von Meitner/Frisch gehören zu unterschiedlichen Schritten derselben Entdeckungsgeschichte.' }
+      explanation: 'Der experimentelle Befund von Hahn/Straßmann und die Deutung von Meitner/Frisch gehören zu unterschiedlichen Schritten derselben Entdeckungsgeschichte.' },
+    { id: 'chernobyl', group: 'history', prompt: 'Was geschah am 26. April 1986 in Tschernobyl?',
+      options: ['Ein Tsunami überflutete das Kraftwerk.', 'Bei einem Test geriet Block 4 außer Kontrolle; Explosion und Graphitbrand setzten große Mengen radioaktiver Stoffe frei.', 'Eine Atombombe wurde gezündet.'], answer: 1,
+      explanation: 'Während eines Sicherheitstests stieg die Leistung des RBMK-Reaktors unkontrollierbar an. Explosion und tagelanger Brand des Graphit-Moderators verteilten radioaktive Stoffe bis nach Deutschland.' },
+    { id: 'fukushima', group: 'history', prompt: 'Womit begann der Unfall von Fukushima am 11. März 2011?',
+      options: ['Mit einem Erdbeben und einem Tsunami; danach fiel die Stromversorgung für die Kühlung aus.', 'Mit einem Flugzeugabsturz.', 'Mit einem Test einer Wasserstoffbombe.'], answer: 0,
+      explanation: 'Die Reaktoren wurden beim Erdbeben abgeschaltet. Der Tsunami zerstörte die Notstromversorgung; ohne Kühlung kam es in den Blöcken 1 bis 3 zu Kernschmelzen.' },
+    { id: 'decay-heat-accident', group: 'history', prompt: 'Warum schmolzen in Fukushima Reaktorkerne, obwohl die Kettenreaktion gestoppt war?',
+      options: ['Weil Uran dabei zu Blei wurde.', 'Weil Regelstäbe Wärme erzeugen.', 'Weil Spaltprodukte weiter zerfallen und Nachzerfallswärme abgeführt werden muss.'], answer: 2,
+      explanation: 'Auch nach dem Abschalten zerfallen radioaktive Spaltprodukte und erzeugen Wärme. Fällt die Kühlung aus, steigt die Temperatur, bis Brennelemente schmelzen können.' }
   ];
 
   const finalTasks = [
@@ -223,16 +268,24 @@
       solution: '3 Neutronen. n = ungeladenes Neutron (A = 1, Z = 0), * = angeregt. A: 235 + 1 = 141 + 92 + 3 = 236; Z: 92 = 56 + 36. Ein möglicher Spaltungskanal, nicht der einzige.' },
     { id: 'growth', station: 5, prompt: '8 Startspaltungen, jede Generation im Mittel doppelt so viele: Notiere g = 0 bis 4. Warum exponentiell? Muss jede Kettenreaktion so wachsen?',
       solution: '8, 16, 32, 64, 128. Gleicher Faktor 2 pro Generation, nicht gleicher Zuwachs. N(g) = 8 · 2^g. Bei Faktor 1 bleibt die Zahl gleich, bei Faktor kleiner 1 klingt sie ab.' },
+    { id: 'chain-tree', station: 5, prompt: 'Idealfall: Jede Spaltung setzt 3 Neutronen frei, und jedes spaltet einen weiteren Kern. Notiere die Spaltungen für g = 0 bis 4 und die Gesamtzahl bis g = 3. Warum ist das ein Idealfall?',
+      solution: '1, 3, 9, 27, 81; N(g) = 3^g. Bis g = 3 insgesamt 1 + 3 + 9 + 27 = 40. Real werden im Mittel 2 bis 3 Neutronen frei; viele entweichen oder werden ohne Spaltung absorbiert. Deshalb wächst eine reale Kette langsamer oder bleibt im Kraftwerk gleich (Faktor 1).' },
+    { id: 'products', station: 5, prompt: 'Die Spaltprodukte Ba-141 (Z = 56) und Kr-92 (Z = 36) sind radioaktiv. Gib ihre β⁻-Zerfallsreihen bis zu den stabilen Kernen Pr-141 (Z = 59) und Zr-92 (Z = 40) an. Wie viele Zerfälle sind es jeweils?',
+      solution: 'Ba-141 → La-141 → Ce-141 → Pr-141: 3 β⁻. Kr-92 → Rb-92 → Sr-92 → Y-92 → Zr-92: 4 β⁻. A bleibt gleich, Z steigt je Zerfall um 1. Halbwertszeiten reichen von Sekunden bis zu Wochen (Ce-141 ≈ 32,5 d); deshalb bleibt abgebrannter Brennstoff lange radioaktiv.' },
     { id: 'series', station: 5, prompt: 'U-238 (Z = 92) → … → Pb-206 (Z = 82): Bestimme die Anzahl der α- und β⁻-Zerfälle im Hauptpfad. Warum ist dies keine Spaltungskettenreaktion?',
       solution: '(238 − 206) : 4 = 8 α. Danach Z = 92 − 16 = 76; 82 − 76 = 6 β⁻. Aufeinanderfolgende natürliche Umwandlungen eines Kerns, keine Vervielfachung durch freigesetzte Neutronen.' },
     { id: 'power', station: 6, prompt: 'Beschreibe den Weg vom Reaktorkern zum Strom. Unterscheide Regelstab und Moderator. Warum nach Abschalten weiter kühlen?',
       solution: 'Spaltung → Wärme im Primärkreis → Dampferzeuger/sekundärer Dampf → Turbine → Generator/Strom; Kondensator und Kühlkreis führen Abwärme ab. Regelstäbe absorbieren, Moderator bremst Neutronen. Spaltprodukte erzeugen weiter Nachzerfallswärme.' },
-    { id: 'history', station: 8, prompt: 'Ordne Becquerel, Marie/Pierre Curie, Hahn/Straßmann und Meitner/Frisch jeweils einen Beitrag zu.',
-      solution: 'Becquerel: natürliche Radioaktivität 1896. Curies: systematische Forschung, Polonium/Radium 1898. Hahn/Straßmann: Barium-Befund Ende 1938. Meitner/Frisch: physikalische Deutung der Kernspaltung 1939.' },
     { id: 'evaluate', station: 6, prompt: 'Bewerte eine Anwendung von Kernenergie oder ionisierender Strahlung: Nenne Nutzen, Risiko und Schutzmaßnahme und begründe deine Abwägung.',
       solution: 'Zum Beispiel medizinisch nötige Diagnose versus zusätzliche Strahlenbelastung, mit Prüfung von Alternativen und Optimierung. Oder Stromerzeugung versus Unfall- und Abfallrisiken, mit Sicherheitskontrollen und langfristigem Einschluss. Eine begründete Gewichtung ist verlangt; kein pauschales Ja/Nein.' },
-    { id: 'fusion', station: 7, optional: true, prompt: 'Zusatz: Erkläre den Unterschied zwischen Spaltung und Fusion. Welche davon trägt bei einer Wasserstoffbombe ebenfalls zur Energie bei?',
-      solution: 'Spaltung teilt einen schweren Kern, Fusion verbindet leichte Kerne. Thermonukleare Waffen nutzen auch Fusion. Keine Konstruktion oder Auslösung beschreiben.' }
+    { id: 'bomb', station: 7, prompt: 'Erkläre unterkritisch und überkritisch. Beschreibe das Grundprinzip einer Atombombe (Kanonen- oder Implosionsprinzip) und nenne vier Folgen einer Explosion.',
+      solution: 'Unterkritisch: Zu viele Neutronen gehen verloren, die Kette erlischt. Überkritisch: Jede Spaltung löst im Mittel mehr als eine weitere aus. Konventioneller Sprengstoff schiebt zwei Teilmassen zusammen (Kanonenprinzip) oder presst eine Kugel zusammen (Implosionsprinzip). Folgen: Lichtblitz/Hitze, Druckwelle, ionisierende Strahlung, radioaktiver Fallout.' },
+    { id: 'history', station: 8, prompt: 'Ordne Becquerel, Marie/Pierre Curie, Hahn/Straßmann und Meitner/Frisch jeweils einen Beitrag zu.',
+      solution: 'Becquerel: natürliche Radioaktivität 1896. Curies: systematische Forschung, Polonium/Radium 1898. Hahn/Straßmann: Barium-Befund Ende 1938. Meitner/Frisch: physikalische Deutung der Kernspaltung 1939.' },
+    { id: 'accidents', station: 8, prompt: 'Vergleiche die Reaktorunfälle von Tschernobyl 1986 und Fukushima 2011: Ursache, Ablauf, Folgen. Warum ist ein Reaktorunfall keine Atombombenexplosion?',
+      solution: 'Tschernobyl: Bei einem Test geriet Block 4 (RBMK) außer Kontrolle; Explosion und Graphitbrand, radioaktive Wolke bis Deutschland, 30-km-Sperrzone. Fukushima: Erdbeben und Tsunami, Notstrom und Kühlung fallen aus, Nachzerfallswärme führt zu Kernschmelzen in den Blöcken 1–3, Wasserstoffexplosionen, rund 120 000 Menschen evakuiert. Beide: INES-Stufe 7. Im Reaktor fehlt die schlagartig überkritische Anordnung einer Bombe; Explosionen waren Dampf- bzw. Wasserstoffexplosionen.' },
+    { id: 'fusion', station: 7, optional: true, prompt: 'Zusatz: Erkläre den Unterschied zwischen Spaltung und Fusion. Warum braucht eine Wasserstoffbombe zuerst eine Spaltungsstufe? Prüfe A und Z bei ²H + ³H → ⁴He + n.',
+      solution: 'Spaltung teilt einen schweren Kern, Fusion verschmilzt leichte Kerne. Fusion braucht viele Millionen Grad und hohen Druck; diese Bedingungen liefert die Spaltungsexplosion der ersten Stufe. A: 2 + 3 = 4 + 1; Z: 1 + 1 = 2 + 0.' }
   ];
 
   function gradeQuestion(id, answer) {
@@ -346,10 +399,45 @@
   const fissionCaptions = [
     'Start: U-235 besitzt 92 Protonen und 143 Neutronen. Ein zusätzliches Neutron n trifft auf den schweren Kern. Die Zeichnung zeigt nur den Kern, nicht die Elektronenhülle.',
     'Aufnahme: 235 + 1 = 236 Kernteilchen. Es entsteht U-236* mit 92 Protonen und 144 Neutronen. Das Sternchen bedeutet angeregt: Der verformte Kern kann sich spalten; U-235 war bereits vorher radioaktiv.',
-    'Ein möglicher Ausgang: Ba-141 (56 p, 85 n), Kr-92 (36 p, 56 n) und 3 freie Neutronen. Die Spaltprodukte fliegen auseinander. Bewegungsenergie wird im Material zu Wärme. Freie Neutronen können weitere Spaltungen auslösen.'
+    'Ein möglicher Ausgang: Ba-141 (56 p, 85 n), Kr-92 (36 p, 56 n) und 3 freie Neutronen. Die Spaltprodukte fliegen auseinander. Bewegungsenergie wird im Material zu Wärme. Freie Neutronen können weitere Spaltungen auslösen. Aber: Ba-141 und Kr-92 haben zu viele Neutronen – sie sind radioaktiv.',
+    '1. β⁻-Zerfall: Im Kern wandelt sich ein Neutron in ein Proton um, ein Elektron e⁻ wird ausgesandt. A bleibt gleich, Z steigt um 1. Ba-141 → La-141 (Halbwertszeit von Ba-141 ≈ 18 min), Kr-92 → Rb-92 (Halbwertszeit von Kr-92 ≈ 1,8 s).',
+    '2. β⁻-Zerfall: La-141 → Ce-141 (≈ 3,9 h) und Rb-92 → Sr-92 (≈ 4,5 s). Die Massenzahlen bleiben 141 und 92, die Kernladungszahlen steigen auf 58 und 38. Beide Kerne sind weiterhin radioaktiv.',
+    '3. β⁻-Zerfall: Ce-141 → Pr-141 (≈ 32,5 Tage). Pr-141 ist stabil – die Barium-Reihe ist zu Ende. Sr-92 → Y-92 (≈ 2,7 h): Y-92 ist noch radioaktiv.',
+    '4. β⁻-Zerfall: Y-92 → Zr-92 (≈ 3,5 h). Zr-92 ist stabil. Nach 3 + 4 = 7 β⁻-Zerfällen sind aus Ba-141 und Kr-92 die stabilen Kerne Pr-141 und Zr-92 geworden: Von diesem Spaltungsweg bleibt kein radioaktives Material übrig.'
   ];
+  const fissionStepLabels = ['Neutron trifft U-235', 'U-236* entsteht', 'Spaltung', '1. β⁻-Zerfall', '2. β⁻-Zerfall', '3. β⁻-Zerfall', '4. β⁻ · stabil'];
+  function decayChainDrawing(stage) {
+    let drawing = '<defs><marker id="decay-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4a6d88"/></marker></defs>';
+    let emitted = 0;
+    fissionDecayChains.forEach((chain, row) => {
+      const cy = row === 0 ? 120 : 290;
+      const last = Math.min(stage, chain.nuclides.length - 1);
+      drawing += `<text x="20" y="${cy - 78}" font-size="18" font-weight="700">${chain.title}</text>`;
+      chain.nuclides.slice(0, last + 1).forEach((nuclide, index) => {
+        const cx = 80 + index * 160;
+        const stable = nuclide.halfLife === null;
+        const current = index === last;
+        const [fill, stroke] = !current ? ['#eef1f5', '#9aa7b4'] : stable ? ['#dcefdf', '#2f7a4a'] : ['#fde6cf', '#b8641d'];
+        drawing += `<g data-nuclide="${nuclide.symbol}-${nuclide.mass}" data-stable="${stable}" data-current="${current}">`;
+        drawing += `<rect x="${cx - 55}" y="${cy - 45}" width="110" height="90" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="${current ? 4 : 2}"/>`;
+        drawing += text(cx, cy - 12, `${nuclide.symbol}-${nuclide.mass}`, 22) + text(cx, cy + 11, `Z = ${nuclide.charge} · N = ${nuclide.mass - nuclide.charge}`, 14);
+        drawing += text(cx, cy + 33, stable ? 'stabil ✓' : current ? 'radioaktiv' : 'umgewandelt', 14) + '</g>';
+        if (index > 0) {
+          const parent = chain.nuclides[index - 1];
+          const mid = cx - 80;
+          emitted++;
+          drawing += `<path d="M ${mid - 22} ${cy} H ${mid + 20}" stroke="#4a6d88" stroke-width="3" fill="none" marker-end="url(#decay-arrow)"/>`;
+          drawing += `<g data-emitted-electron="true">${circle(mid, cy - 34, 9, '#92c5ed', '−')}</g>` + text(mid, cy - 50, 'β⁻', 15) + text(mid, cy + 24, parent.halfLife, 12);
+        }
+      });
+    });
+    drawing += text(400, 390, `${emitted} β⁻-Zerfälle bisher · A bleibt gleich, Z steigt je Zerfall um 1`, 17);
+    drawing += text(400, 414, 'Orange: noch radioaktiv · Grün: stabil · Grau: schon umgewandelt · Zahl unter dem Pfeil: Halbwertszeit', 13);
+    return drawing;
+  }
   function fissionDrawing(step) {
-    if (!Number.isInteger(step) || step < 0 || step > 2) throw new RangeError('Unbekannter Spaltungsschritt.');
+    if (!Number.isInteger(step) || step < 0 || step >= fissionCaptions.length) throw new RangeError('Unbekannter Spaltungsschritt.');
+    if (step >= 3) return svg(decayChainDrawing(step - 2), fissionCaptions[step], 800, 425);
     let drawing = '<defs><marker id="fission-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4a6d88"/></marker></defs>';
     const arrow = (path) => `<path d="${path}" stroke="#4a6d88" stroke-width="3" fill="none" marker-end="url(#fission-arrow)"/>`;
     const neutron = (x, y) => `<g data-free-neutron="true">${circle(x, y, 12, '#9dc7b2', 'n')}</g>`;
@@ -369,6 +457,158 @@
     }
     drawing += text(400, 400, 'Orange: Protonen · Grün: Neutronen · schematische Kernbilder', 16);
     return svg(drawing, fissionCaptions[step], 800, 425);
+  }
+
+  const chainTreeCaptions = [
+    'Generation g = 0: Ein Neutron spaltet einen U-235-Kern. Dabei werden im Idealfall 3 Neutronen frei. Sie fliegen zu drei weiteren U-235-Kernen.',
+    'Generation g = 1: 3 Spaltungen. Jede setzt wieder 3 Neutronen frei: 3 · 3 = 9 Neutronen fliegen zu neuen Kernen.',
+    'Generation g = 2: 9 Spaltungen. 9 · 3 = 27 neue Neutronen. Der Zuwachs wird selbst immer größer.',
+    'Generation g = 3: 27 Spaltungen, insgesamt schon 1 + 3 + 9 + 27 = 40. Als Nächstes könnten 81 Spaltungen folgen: N(g) = 3^g – exponentielles Wachstum.',
+    'Vergleich Kraftwerk: Auch hier entstehen pro Spaltung 2 bis 3 Neutronen. Regelstäbe und Material nehmen einen Teil auf, andere entweichen. Nur im Mittel 1 Neutron löst die nächste Spaltung aus: 1 → 1 → 1 → 1, die Kettenreaktion bleibt gleichmäßig.'
+  ];
+  const chainStepLabels = ['g = 0 · 1', 'g = 1 · 3', 'g = 2 · 9', 'g = 3 · 27', 'Kraftwerk: Faktor 1'];
+  function splitNucleus(x, y, radius, generation) {
+    return `<g data-fission="${generation}"><circle cx="${x}" cy="${y}" r="${radius * 1.25}" fill="#ffe9a8"/><circle cx="${x - radius * 0.45}" cy="${y}" r="${radius * 0.6}" fill="#8264af"/><circle cx="${x + radius * 0.5}" cy="${y}" r="${radius * 0.5}" fill="#b59ad6"/></g>`;
+  }
+  function waitingNucleus(x, y, radius) {
+    return `<circle data-waiting="true" cx="${x}" cy="${y}" r="${radius}" fill="#e9e0f3" stroke="#78618f" stroke-width="2"/>`;
+  }
+  function neutronPath(x1, y1, x2, y2, extra = '') {
+    return `<path d="M ${x1} ${y1} L ${x2} ${y2}" stroke="#3f8f6b" stroke-width="2" fill="none"${extra}/><circle data-neutron="true" cx="${(x1 + x2) / 2}" cy="${(y1 + y2) / 2}" r="4" fill="#3f8f6b"/>`;
+  }
+  function chainTreeDrawing(step) {
+    if (!Number.isInteger(step) || step < 0 || step >= chainTreeCaptions.length) throw new RangeError('Unbekannter Kettenschritt.');
+    const rows = [60, 150, 240, 330];
+    const radii = [18, 14, 11, 8];
+    let drawing = '';
+    if (step === 4) {
+      rows.forEach((y, g) => {
+        drawing += anchoredText(20, y + 5, `g = ${g} · 1 Spaltung`, 16, 'start', 700) + splitNucleus(450, y, 16, g);
+        drawing += `<path d="M 432 ${y + 8} L 270 ${y + 40}" stroke="#7d8996" stroke-width="2" fill="none"/>${circle(270, y + 40, 6, '#7d8996')}`;
+        drawing += `<path d="M 468 ${y + 8} L 640 ${y + 40}" stroke="#3f8f6b" stroke-width="2" stroke-dasharray="5 4" fill="none"/>${circle(640, y + 40, 5, '#3f8f6b')}`;
+        if (g < 3) drawing += neutronPath(450, y + 18, 450, rows[g + 1] - 18);
+      });
+      drawing += `<rect x="242" y="40" width="22" height="340" rx="4" fill="#4b5563"/>` + anchoredText(140, 395, 'absorbiert (z. B. Regelstab)', 14);
+      drawing += anchoredText(600, 395, 'entweicht aus dem Kern', 14) + anchoredText(700, 230, 'Faktor 1:', 17, 'start', 700) + anchoredText(700, 252, '1 → 1 → 1 → 1', 17);
+    } else {
+      for (let g = 0; g <= Math.min(step + 1, 3); g++) {
+        const count = 3 ** g;
+        const spacing = 730 / count;
+        drawing += anchoredText(15, rows[g] + 5, g <= step ? `g = ${g}: ${count}` : `g = ${g}: wartet`, 16, 'start', 700);
+        for (let i = 0; i < count; i++) {
+          const x = 150 + (i + 0.5) * spacing;
+          if (g > 0) {
+            const parentX = 150 + (Math.floor(i / 3) + 0.5) * spacing * 3;
+            drawing += neutronPath(parentX, rows[g - 1] + radii[g - 1], x, rows[g] - radii[g], g > step ? ' stroke-dasharray="5 4"' : '');
+          }
+          drawing += g <= step ? splitNucleus(x, rows[g], radii[g], g) : waitingNucleus(x, rows[g], radii[g]);
+        }
+      }
+      const total = idealChain(step + 1).reduce((sum, value) => sum + value, 0);
+      if (step === 3) drawing += text(515, 375, '→ 81 freie Neutronen für g = 4', 16);
+      drawing += text(450, 405, `Spaltungen in g = ${step}: 3<tspan baseline-shift="super" font-size="12">${step}</tspan> = ${3 ** step} · insgesamt bisher ${total}`, 18);
+    }
+    drawing += text(450, 430, 'Gelb-violett: gespaltener Kern · hell: wartender U-235-Kern · grün: Neutron', 14);
+    return svg(drawing, chainTreeCaptions[step], 900, 440);
+  }
+
+  const bombSteps = {
+    gun: ['Aufbau: Zwei Teilmassen aus spaltbarem Material liegen getrennt. Jede ist für sich unterkritisch: Zu viele Neutronen entweichen, eine Kettenreaktion kann nicht anwachsen.',
+      'Zündung: Konventioneller Sprengstoff schiebt eine Teilmasse sehr schnell auf die andere. Zusammen ist die Anordnung überkritisch.',
+      'Kettenreaktion: Jede Spaltung löst im Mittel mehr als eine weitere aus (1 → 3 → 9 → …). In Bruchteilen einer Sekunde finden extrem viele Spaltungen statt.',
+      'Folgen: Lichtblitz und Hitze, Druckwelle, ionisierende Strahlung und radioaktiver Fallout. So wurde Hiroshima am 6. August 1945 zerstört.'],
+    implosion: ['Aufbau: Eine Kugel aus spaltbarem Material ist von konventionellem Sprengstoff umgeben. In diesem Zustand ist sie unterkritisch.',
+      'Zündung: Der Sprengstoff zündet ringsum gleichzeitig. Die Druckwelle läuft nach innen und presst die Kugel zusammen: höhere Dichte → überkritisch.',
+      'Kettenreaktion: In der dicht gepressten Kugel lösen Neutronen immer mehr Spaltungen aus – unkontrolliert und extrem schnell.',
+      'Folgen: Lichtblitz und Hitze, Druckwelle, ionisierende Strahlung und radioaktiver Fallout. Nach diesem Prinzip wurde Nagasaki am 9. August 1945 zerstört.'],
+    hydrogen: ['Aufbau: Zwei Stufen in einer Hülle. Stufe 1 ist eine Spaltungsbombe. Stufe 2 enthält Fusionsstoff mit schweren Wasserstoff-Isotopen (Deuterium, Tritium).',
+      'Zündung Stufe 1: Die Spaltungsbombe explodiert wie eine Atombombe. Nur so entstehen die nötigen extremen Bedingungen.',
+      'Übergang: Strahlung und Hitze der ersten Stufe pressen und erhitzen den Fusionsstoff auf viele Millionen Grad – ähnlich wie im Inneren der Sonne.',
+      'Fusion: Wasserstoffkerne verschmelzen, z. B. ²H + ³H → ⁴He + n + Energie. Die Sprengkraft kann ein Vielfaches einer Spaltungsbombe betragen. Eine Wasserstoffbombe wurde nie im Krieg eingesetzt, aber vielfach getestet.']
+  };
+  const bombStepLabels = { gun: ['Aufbau', 'Zündung', 'Kettenreaktion', 'Folgen'], implosion: ['Aufbau', 'Zündung', 'Kettenreaktion', 'Folgen'], hydrogen: ['Aufbau', 'Stufe 1 zündet', 'Strahlung & Hitze', 'Fusion'] };
+  function burst(cx, cy, radius, rays = 12) {
+    let drawing = `<g data-burst="true"><circle cx="${cx}" cy="${cy}" r="${radius}" fill="#ffd35c" opacity=".85"/><circle cx="${cx}" cy="${cy}" r="${radius * 0.55}" fill="#fff4c2"/>`;
+    for (let i = 0; i < rays; i++) {
+      const angle = 2 * Math.PI * i / rays;
+      drawing += `<path d="M ${cx + Math.cos(angle) * radius * 1.05} ${cy + Math.sin(angle) * radius * 1.05} L ${cx + Math.cos(angle) * radius * 1.35} ${cy + Math.sin(angle) * radius * 1.35}" stroke="#e08a1e" stroke-width="3" fill="none"/>`;
+    }
+    return drawing + '</g>';
+  }
+  function chainSparks(cx, cy, spread) {
+    let drawing = '';
+    [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1.3], [0, 1.3], [-1.3, 0], [1.3, 0]].forEach(([dx, dy]) => {
+      drawing += `<path d="M ${cx} ${cy} L ${cx + dx * spread} ${cy + dy * spread}" stroke="#3f8f6b" stroke-width="2" fill="none"/>${circle(cx + dx * spread, cy + dy * spread, 5, '#3f8f6b')}`;
+    });
+    return drawing;
+  }
+  function consequences(cx, cy) {
+    let drawing = burst(cx, cy, 105, 16);
+    [['Lichtblitz und Hitze', cx - 250, cy - 95], ['Druckwelle', cx + 250, cy - 95], ['ionisierende Strahlung', cx - 250, cy + 105], ['radioaktiver Fallout', cx + 250, cy + 105]].forEach(([label, x, y]) => {
+      drawing += `<g data-consequence="true"><rect x="${x - 95}" y="${y - 22}" width="190" height="36" rx="18" fill="#fff" stroke="#8b3434" stroke-width="2"/>${text(x, y + 2, label, 16)}</g>`;
+    });
+    return drawing + `<circle cx="${cx}" cy="${cy}" r="150" fill="none" stroke="#8b3434" stroke-width="3" stroke-dasharray="10 8"/>`;
+  }
+  function bombDrawing(type, step) {
+    if (!Object.hasOwn(bombSteps, type) || !Number.isInteger(step) || step < 0 || step > 3) throw new RangeError('Unbekanntes Bombenschema.');
+    const purple = '#8264af';
+    const explosive = '#e2894f';
+    const arrowId = `bomb-arrow-${type}`;
+    const arrowEnd = ` marker-end="url(#${arrowId})"`;
+    let drawing = `<defs><marker id="${arrowId}" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4a6d88"/></marker></defs>`;
+    if (type === 'gun') {
+      drawing += '<rect x="60" y="120" width="680" height="110" rx="50" fill="#e7ebf0" stroke="#53647a" stroke-width="3"/>' + text(400, 105, 'Hülle', 15);
+      if (step === 3) drawing += consequences(400, 175);
+      else {
+        drawing += step === 0 ? `<rect x="90" y="140" width="60" height="70" rx="6" fill="${explosive}"/>` : burst(120, 175, 32);
+        drawing += text(120, 260, 'Sprengstoff', 15);
+        const leftX = step === 0 ? 170 : 520;
+        drawing += `<rect data-part="mass" x="${leftX}" y="140" width="80" height="70" rx="8" fill="${purple}"/><rect data-part="mass" x="600" y="140" width="80" height="70" rx="8" fill="${purple}"/>`;
+        if (step === 0) {
+          drawing += text(210, 260, 'Teilmasse 1', 15) + text(640, 260, 'Teilmasse 2', 15) + text(420, 182, 'getrennt → unterkritisch', 17);
+        } else {
+          drawing += `<path d="M 180 175 H 505" stroke="#4a6d88" stroke-width="3" stroke-dasharray="8 6" fill="none"${arrowEnd}/>` + text(340, 165, 'sehr schnell zusammengeschoben', 16);
+          drawing += text(600, 260, 'zusammen → überkritisch', 16);
+          if (step === 2) drawing += `<circle cx="600" cy="175" r="55" fill="#ffe9a8" opacity=".7"/>` + chainSparks(600, 175, 40) + text(600, 300, 'Kettenreaktion: 1 → 3 → 9 → 27 → …', 17);
+        }
+      }
+    } else if (type === 'implosion') {
+      drawing += `<circle cx="400" cy="175" r="150" fill="#e7ebf0" stroke="#53647a" stroke-width="3"/>`;
+      if (step === 3) drawing += consequences(400, 175);
+      else {
+        for (let i = 0; i < 12; i++) {
+          const angle = 2 * Math.PI * i / 12;
+          const x = 400 + Math.cos(angle) * 115;
+          const y = 175 + Math.sin(angle) * 115;
+          drawing += step === 0 ? `<circle data-part="explosive" cx="${x}" cy="${y}" r="26" fill="${explosive}"/>` : burst(x, y, 16, 6);
+          if (step >= 1) drawing += `<path d="M ${400 + Math.cos(angle) * 92} ${175 + Math.sin(angle) * 92} L ${400 + Math.cos(angle) * 62} ${175 + Math.sin(angle) * 62}" stroke="#4a6d88" stroke-width="3" fill="none"${arrowEnd}/>`;
+        }
+        const radius = step === 0 ? 55 : 36;
+        drawing += `<circle data-part="core" cx="400" cy="175" r="${radius}" fill="${step === 0 ? purple : '#5b3f8a'}"/>`;
+        if (step === 2) drawing += chainSparks(400, 175, 26);
+        drawing += step === 0 ? text(660, 120, 'Sprengstoff ringsum', 16) + text(660, 230, 'Kugel: unterkritisch', 16)
+          : step === 1 ? text(660, 120, 'Druck von allen Seiten', 16) + text(660, 230, 'dichter → überkritisch', 16)
+          : text(660, 175, 'Kettenreaktion', 17);
+      }
+    } else {
+      drawing += '<rect x="40" y="95" width="720" height="170" rx="70" fill="#e7ebf0" stroke="#53647a" stroke-width="3"/>' + text(400, 82, 'Hülle', 15);
+      const squeezed = step >= 2;
+      if (step >= 1) drawing += burst(185, 180, 58);
+      else drawing += `<circle data-part="primary" cx="185" cy="180" r="55" fill="${purple}"/>`;
+      drawing += `<rect data-part="secondary" x="360" y="${squeezed ? 150 : 125}" width="340" height="${squeezed ? 60 : 110}" rx="${squeezed ? 28 : 45}" fill="${step === 3 ? '#ffd35c' : squeezed ? '#f5c98a' : '#bfe3f0'}" stroke="#2c6d8f" stroke-width="2"/>`;
+      if (step >= 2) {
+        [[250, 135, 350, 140, 300, 110], [250, 225, 350, 220, 300, 250], [262, 180, 350, 180, 306, 180]].forEach(([x1, y1, x2, y2, cx, cy]) => {
+          drawing += `<path d="M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}" stroke="#e08a1e" stroke-width="4" fill="none"${arrowEnd}/>`;
+        });
+        [450, 530, 610].forEach(x => { drawing += `<path d="M ${x} 108 V 142" stroke="#4a6d88" stroke-width="3" fill="none"${arrowEnd}/><path d="M ${x} 252 V 218" stroke="#4a6d88" stroke-width="3" fill="none"${arrowEnd}/>`; });
+      }
+      if (step === 3) drawing += burst(530, 180, 70, 14) + '<rect x="440" y="162" width="180" height="34" rx="17" fill="#fff" stroke="#e08a1e"/>' + text(530, 186, '²H + ³H → ⁴He + n', 18);
+      drawing += text(185, 295, 'Stufe 1: Spaltung', 16) + text(530, 295, step === 3 ? 'Stufe 2: Fusion setzt riesige Energie frei' : 'Stufe 2: Fusionsstoff (²H, ³H)', 16);
+      if (step === 0) drawing += text(530, 186, 'Deuterium, Tritium', 16);
+      if (step === 2) drawing += text(530, 186, 'gepresst und erhitzt', 16);
+    }
+    drawing += text(400, 345, 'Stark vereinfachtes Prinzipbild – keine Maße, Mengen oder Bauanleitung', 14);
+    return svg(drawing, bombSteps[type][step], 800, 360);
   }
 
   const decayHeatShare = 5;
@@ -758,7 +998,7 @@
       [1, 2].forEach(multiple => {
         const time = multiple * halfLife;
         const count = expectedRemaining(200, time, halfLife);
-        drawing += `<path data-half-marker="${multiple}" d="M 70 ${y(count)} H ${x(time)} V 270" stroke="#aa6a13" stroke-width="2" stroke-dasharray="4 4"/>`;
+        drawing += `<path data-half-marker="${multiple}" d="M 70 ${y(count)} H ${x(time)} V 270" fill="none" stroke="#aa6a13" stroke-width="2" stroke-dasharray="4 4"/>`;
         drawing += text(x(time), 330 + (multiple === 1 ? 0 : 22), `${multiple === 1 ? 'T' : '2T'} = ${time} s`, 16);
       });
       const points = counts.map((count, time) => `${x(time)},${y(count)}`).join(' ');
@@ -854,14 +1094,69 @@
     }
     $('#chain-mode').addEventListener('change', updateChain);
     updateChain();
-    function updateFission() {
-      const step = Number($('#fission-step').value);
-      $('#fission-output').value = `${step + 1} von 3`;
+    function createStepper(selector, labels, onChange) {
+      const host = $(selector);
+      const previous = document.createElement('button');
+      const next = document.createElement('button');
+      previous.type = next.type = 'button';
+      previous.className = next.className = 'secondary step-nav';
+      previous.textContent = '← Zurück';
+      next.textContent = 'Weiter →';
+      const list = document.createElement('div');
+      list.className = 'step-list';
+      let current = 0;
+      const buttons = labels.map((label, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'step-button';
+        button.dataset.step = index;
+        button.textContent = `${index + 1} · ${label}`;
+        button.addEventListener('click', () => show(index));
+        list.append(button);
+        return button;
+      });
+      function show(index) {
+        current = index;
+        buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+        previous.disabled = index === 0;
+        next.disabled = index === labels.length - 1;
+        onChange(index);
+      }
+      previous.addEventListener('click', () => show(Math.max(0, current - 1)));
+      next.addEventListener('click', () => show(Math.min(labels.length - 1, current + 1)));
+      host.replaceChildren(previous, list, next);
+      show(0);
+      return { show };
+    }
+    createStepper('#fission-steps', fissionStepLabels, step => {
+      $('#fission-output').textContent = `Bildschritt ${step + 1} von ${fissionStepLabels.length}: ${fissionStepLabels[step]}`;
       $('#fission-picture').innerHTML = fissionDrawing(step);
       $('#fission-result').textContent = fissionCaptions[step];
+    });
+    createStepper('#chain-steps', chainStepLabels, step => {
+      $('#chain-step-output').textContent = `Bildschritt ${step + 1} von ${chainStepLabels.length}`;
+      $('#chain-tree').innerHTML = chainTreeDrawing(step);
+      $('#chain-tree-result').textContent = chainTreeCaptions[step];
+    });
+    let atomBombType = 'gun';
+    let atomBombStep = 0;
+    function renderAtomBomb() {
+      $('#abomb-picture').innerHTML = bombDrawing(atomBombType, atomBombStep);
+      $('#abomb-result').textContent = bombSteps[atomBombType][atomBombStep];
     }
-    $('#fission-step').addEventListener('input', updateFission);
-    updateFission();
+    const atomBombStepper = createStepper('#abomb-steps', bombStepLabels.gun, step => {
+      atomBombStep = step;
+      renderAtomBomb();
+    });
+    document.querySelectorAll('[data-bomb-type]').forEach(button => button.addEventListener('click', () => {
+      atomBombType = button.dataset.bombType;
+      document.querySelectorAll('[data-bomb-type]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+      atomBombStepper.show(0);
+    }));
+    createStepper('#hbomb-steps', bombStepLabels.hydrogen, step => {
+      $('#hbomb-picture').innerHTML = bombDrawing('hydrogen', step);
+      $('#hbomb-result').textContent = bombSteps.hydrogen[step];
+    });
     function updateReactor() {
       const state = reactorState(Number($('#control-rods').value));
       $('#rods-output').value = state.insertion;
@@ -933,6 +1228,7 @@
     module.exports = {
       atomInfo, atomDrawing, shellDistribution, simulateDecay, expectedRemaining, relativeExposure,
       chainGenerations, uraniumSeries, fissionReaction, fissionDrawing, shieldDrawing,
+      fissionDecayChains, idealChain, chainTreeDrawing, bombDrawing, bombSteps,
       reactorState, reactorDrawing, reactorSummary, questions, finalTasks, gradeQuestion, models
     };
   }

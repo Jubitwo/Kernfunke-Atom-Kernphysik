@@ -13,7 +13,7 @@ Interaktive Lernstrecke für die Realschule Baden-Württemberg (Klasse 10, M-Niv
 | Datei | Zweck |
 |---|---|
 | [index.html](./index.html) | Interaktive Lernstrecke mit neun Stationen |
-| [labor.js](./labor.js) | Modelle, Visualisierungen, 36 Auswahlaufgaben und Abschlusstest |
+| [labor.js](./labor.js) | Modelle, Visualisierungen, 45 Auswahlaufgaben und Abschlusstest |
 | [labor.css](./labor.css) | Ergänzende Gestaltung und Druckansicht |
 | [labor.test.cjs](./labor.test.cjs) | Tests der Physikmodelle, Aufgaben und Verdrahtung |
 | [docs/README.md](./docs/README.md) | Lehrplanbezug, Unterrichtsvorschlag, Sicherheit und Pflege |
@@ -24,13 +24,13 @@ Interaktive Lernstrecke für die Realschule Baden-Württemberg (Klasse 10, M-Niv
 2. **Baumeister:** Bohr-Schalen statt einer einzigen Elektronenebene. Für neutrale Atome der ersten 20 Elemente: Besetzungsfolge 2 | 8 | 8 | 2, mit C-, Na- und Ca-Beispielen. Isotope und Ionen bilden; jede gewählte Teilchenzahl wird tatsächlich gezeichnet.
 3. **Strahlungsfinder:** Beschriftete, unterschiedlich gestaltete Schichten Papier → zusätzlich Aluminium → zusätzlich Blei. Gamma-Abschwächung durch wenige weiterlaufende Beispielspuren verstehen. Ionisation, Zellschäden, Kontamination, Anwendungen und Schutz; Abstand/Zeit anhand von 100 Modelltreffern vergleichen.
 4. **Messlabor:** 1 Messschritt = 1 Sekunde. Halbwertszeit in Sekunden, Zeitmarke zum Ablesen, 200 Kernpunkte, Zufallskurve, Erwartungswert und Datentabelle. Nullrate, Zählrohr und Unterschied Bq/Sv.
-5. **Kernspaltung:** U-235 + n → U-236* → Ba-141 + Kr-92 + 3 n, mit Teilchenbildern und A-/Z-Bilanz. Exponentielles Wachstum bei Faktor 2 je Generation klar von gleichbleibenden und abklingenden Kettenreaktionen unterscheiden. Die natürliche U-238-Zerfallsreihe bis Pb-206 separat bilanzieren (8 α, 6 β⁻).
+5. **Kernspaltung:** U-235 + n → U-236* → Ba-141 + Kr-92 + 3 n, mit anklickbaren Bildschritten (Buttons) und A-/Z-Bilanz – weiter über die β⁻-Zerfallsreihen Ba-141 → La-141 → Ce-141 → Pr-141 und Kr-92 → Rb-92 → Sr-92 → Y-92 → Zr-92 bis zu stabilen Kernen. Ein Kettenbaum zeigt Schritt für Schritt das ideale Wachstum 1 → 3 → 9 → 27 (3^g) und zum Vergleich den Kraftwerksfall 1 → 1 → 1. Exponentielles Wachstum klar von gleichbleibenden und abklingenden Kettenreaktionen unterscheiden. Die natürliche U-238-Zerfallsreihe bis Pb-206 separat bilanzieren (8 α, 6 β⁻).
 6. **Kernenergie & Kraftwerk:** Detaillierter Druckwasserreaktor mit Brennelementen, beweglichen Regelstäben, drei getrennten Wasserkreisläufen und nummeriertem Wärmeweg. Der Regler verändert Neutronenzahl, Kernfarbe, Energiefluss, Dampfblasen, Turbinen-/Generatoranimation und die Balken für Wärme, Strom und Abwärme. Voll eingefahrene Stäbe stoppen im Modell die Kettenreaktion und Stromerzeugung; ein vereinfachter Kühlweg führt die verbleibende Nachzerfallswärme ab. Animationen berücksichtigen reduzierte Bewegung.
-7. **Kernwaffen & Verantwortung:** Kontrollierte Nutzung und zerstörerische Energiefreisetzung unterscheiden. Kurzer zusätzlicher Hinweis auf Fusion und Wasserstoffbombe, ausschließlich auf Prinzipienebene.
-8. **Geschichte:** Becquerel, Marie und Pierre Curie, Hahn, Straßmann, Meitner und Frisch historisch einordnen, mit erweiterten Fragen.
-9. **Lernzettel & Abschlusstest:** Merkwissen, Selbstcheck, 14 offene Grundaufgaben und ein freiwilliger Zusatz. Lernzettel, Test ohne Lösungen und Vergleichslösungen sind einzeln druckbar.
+7. **Kernwaffen & Verantwortung:** Kontrollierte Nutzung und zerstörerische Energiefreisetzung unterscheiden. Atombombe (Kanonen- und Implosionsprinzip) sowie zweistufige Wasserstoffbombe als schrittweise Prinzipbilder: Aufbau, Zündung, Kettenreaktion bzw. Fusion, Folgen – ausschließlich auf Schulbuch-Prinzipebene ohne Maße, Mengen oder Bauanleitung.
+8. **Geschichte:** Becquerel, Marie und Pierre Curie, Hahn, Straßmann, Meitner und Frisch historisch einordnen; Reaktorunfälle Tschernobyl 1986 und Fukushima 2011 mit Vergleichstabelle, mit erweiterten Fragen.
+9. **Lernzettel & Abschlusstest:** Merkwissen, Selbstcheck, 18 offene Grundaufgaben und ein freiwilliger Zusatz. Lernzettel, Test ohne Lösungen und Vergleichslösungen sind einzeln druckbar.
 
-36 Auswahlaufgaben, eine Zahlenaufgabe und eine Einstellaufgabe bieten automatische Rückmeldung (38 Lernchecks). Schriftliche Forscheraufträge, ein sicheres Münzexperiment und freie Bewertungsaufgaben ergänzen die Lernstrecke. Der separate Abschlusstest wird anhand von Vergleichskriterien selbst geprüft, nicht automatisch benotet.
+45 Auswahlaufgaben, eine Zahlenaufgabe und eine Einstellaufgabe bieten automatische Rückmeldung (47 Lernchecks). Der Abschlusstest umfasst 18 Grundaufgaben und einen freiwilligen Zusatz. Schriftliche Forscheraufträge, ein sicheres Münzexperiment und freie Bewertungsaufgaben ergänzen die Lernstrecke. Der separate Abschlusstest wird anhand von Vergleichskriterien selbst geprüft, nicht automatisch benotet.
 
 ## Lokal starten
 

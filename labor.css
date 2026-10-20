@@ -75,6 +75,16 @@ tr[aria-current="true"] { background: var(--violet-soft); font-weight: 700; }
   .figure::after { content: "Bild horizontal verschiebbar ↔"; display: block; color: var(--muted); font-size: .85rem; padding: .3rem; }
   .figure:empty::after { content: none; }
 }
+.stepper { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .8rem 0 .3rem; }
+.step-list, .segmented { display: flex; flex-wrap: wrap; gap: .4rem; flex: 1 1 18rem; }
+.segmented { margin: .6rem 0; }
+.step-button { padding: .45rem .75rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-size: .95rem; }
+.step-button:hover { border-color: var(--blue); }
+.step-button[aria-pressed="true"] { border-color: var(--blue); background: var(--blue); color: #fff; font-weight: 700; }
+.step-nav:disabled { opacity: .45; cursor: not-allowed; }
+.step-status { margin: .2rem 0 .5rem; font-weight: 700; color: var(--blue); }
+.time-card.accident { border-top-color: var(--red); background: #fbeeee; }
+caption { text-align: left; font-weight: 700; padding: .4rem 0; }
 @media print {
   body { background: white; font-size: 11pt; }
   .hero { background: white; color: black; padding: 1rem; }

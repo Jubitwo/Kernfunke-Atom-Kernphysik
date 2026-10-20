@@ -52,14 +52,17 @@ Für eine 90-minütige Wiederholung nur ausgewählte Experimente und Aufgaben ei
 - Das Zerfallsmodell simuliert für jeden noch vorhandenen Kern pro Sekunde eine Überlebensentscheidung mit Wahrscheinlichkeit `(1/2)^(1/T)`, T in Sekunden. **1 Messschritt = 1 s**; der Regler wählt einen erfundenen Modellstoff mit T zwischen 2 und 8 s. Bereits zerfallene Kerne bleiben entfernt. Start: exakt 200 Kerne.
 - Der Zeitpunkt-Regler liest dieselbe Zufallsreihe ab, ohne sie neu zu ziehen. Diagramm, Zeitmarke, Punktbild und Tabelle zeigen denselben Zählwert. Hilfslinien markieren T und 2T; Erwartungswert und Zufallsverlauf sind getrennt.
 - Der Abstandsvergleich nutzt 100 frei gewählte Modelltreffer bei 1 m und 1 min. Bei 2 m/1 min: 25, bei 2 m/2 min: 50. Gleiche Detektorfläche und idealisierte Punktquelle sind Voraussetzung; keine realen Dosen oder sicheren Zeiten.
-- Die U-235-Spaltung zeigt nach Aufnahme eines Neutrons U-236* und einen möglichen Kanal Ba-141/Kr-92/3 n. Protonen und Neutronen sind als vereinfachte Zählbilder dargestellt; die A-/Z-Bilanzen werden geprüft.
+- Die U-235-Spaltung zeigt nach Aufnahme eines Neutrons U-236* und einen möglichen Kanal Ba-141/Kr-92/3 n. Protonen und Neutronen sind als vereinfachte Zählbilder dargestellt; die A-/Z-Bilanzen werden geprüft. Sieben anklickbare Bildschritte führen über die β⁻-Zerfallsreihen (Ba-141 18,27 min → La-141 3,92 h → Ce-141 32,5 d → Pr-141 stabil; Kr-92 1,84 s → Rb-92 4,49 s → Sr-92 2,66 h → Y-92 3,54 h → Zr-92 stabil) bis zu stabilen Endkernen. Hinweis: Das gilt nur für diesen Spaltkanal; andere Spaltprodukte wie Cs-137 (≈ 30 a) bleiben lange radioaktiv.
+- Der Kettenbaum zeigt 1 → 3 → 9 → 27 Spaltungen (N(g) = 3^g, ideal) und im Vergleich den Kraftwerksfall mit Faktor 1.
+- Station 7 zeigt Atombombe (Kanonen-/Implosionsprinzip) und zweistufige Wasserstoffbombe als Prinzipbilder in vier Schritten, ausdrücklich ohne Maße, Mengen oder Bauanleitung.
+- Station 8 ergänzt Tschernobyl (26.04.1986) und Fukushima (11.03.2011), jeweils INES 7, mit Vergleichstabelle.
 - Generationen heißen **g**, das Teilchensymbol **n** bedeutet Neutron. Wachstumsfall: Faktor 2, N(g) = 8 · 2^g. Alle drei Diagrammfälle haben dieselbe Skala. Bei Faktor 0,5 sind Bruchteile statistische Mittelwerte, nicht halbe reale Spaltungen.
 - Die natürliche U-238-Reihe endet im Hauptpfad bei stabilem Pb-206 (8 α, 6 β⁻). Sie ist keine Spaltungskettenreaktion. Die aufklappbare Tabelle zeigt den Hauptpfad einschließlich Pa-234m, ohne seltene Nebenäste und begleitende Gammaübergänge.
 - Der Stabregler verändert die eingezeichnete Einfahrtiefe, nicht eine erfundene Prozentleistung. Sicherheit oder konkrete Kraftwerksleistung lassen sich aus der Stellung allein nicht ableiten.
-- 36 Auswahlaufgaben, eine Zahlenaufgabe und die Magnesium-Einstellung zählen zu den 38 Lernchecks. Eine geänderte Antwort muss erneut geprüft werden. Das Anzeigen der Magnesium-Musterlösung gibt allein keinen Punkt.
+- 45 Auswahlaufgaben, eine Zahlenaufgabe und die Magnesium-Einstellung zählen zu den 47 Lernchecks. Eine geänderte Antwort muss erneut geprüft werden. Das Anzeigen der Magnesium-Musterlösung gibt allein keinen Punkt.
 - Fortschritt, Antworten und Freitext existieren nur bis zum Neuladen. Es gibt keine personenbezogene Auswertung oder Übertragung.
 - Freitext wird **nicht automatisch inhaltlich bewertet**. Der Kriterienvergleich zeigt Muster und verlangt eine eigene Reflexion.
-- Der Abschlusstest hat 14 offene Grundaufgaben und einen freiwilligen Zusatz zu Fusion. Richtzeit 35–45 Minuten; Antworten werden nicht automatisch benotet. Die Lösungskriterien verweisen auf passende Stationen zur Nacharbeit.
+- Der Abschlusstest hat 18 offene Grundaufgaben und einen freiwilligen Zusatz zu Fusion. Richtzeit 45–60 Minuten; Antworten werden nicht automatisch benotet. Die Lösungskriterien verweisen auf passende Stationen zur Nacharbeit.
 - Station 9 druckt Lernzettel, Test ohne Lösungen und Lösungen gezielt getrennt. Eigene Texte werden im Testdruck übernommen, ansonsten bleibt Schreibraum. Nach dem Druckdialog wird der spezielle Druckmodus zurückgesetzt, auch nach Abbrechen. Der allgemeine Labordruck zeigt alle Stationen, aber keinen Lösungsanhang.
 
 ## Erwartungshorizont für schriftliche Aufgaben
@@ -91,11 +94,14 @@ Für eine 90-minütige Wiederholung nur ausgewählte Experimente und Aufgaben ei
 - [BfS: Ionisierende Strahlung](https://www.bfs.de/DE/themen/ion/ion_node.html): vertiefende Leseempfehlung. Der automatisierte Abruf war eingeschränkt (403); nicht als erfolgreich geprüfter Abruf ausgegeben.
 - [LEIFIphysik: Kernspaltung](https://www.leifiphysik.de/kern-teilchenphysik/kernspaltung-und-kernfusion/grundwissen/kernspaltung): Beispiel schwerer Kerne und Energie aus stärker gebundenen Spaltprodukten.
 - [Uran-Radium-Reihe](https://de.wikipedia.org/wiki/Uran-Radium-Reihe): Nuklidtabelle für U-238 bis Pb-206, Pa-234m und Nebenäste.
+- [BfS: Unfall in Fukushima](https://www.bfs.de/DE/themen/ion/notfallschutz/notfall/fukushima/unfall.html): Datum, Erdbeben 9,0, Tsunami, Ausfall der Kühlung, Evakuierung, INES 7.
+- [Nuklearkatastrophe von Tschernobyl](https://de.wikipedia.org/wiki/Nuklearkatastrophe_von_Tschernobyl): Datum, Block 4, RBMK, Test, Explosion, Graphitbrand, Sperrzone.
+- [IAEA LiveChart of Nuclides](https://www-nds.iaea.org/relnsd/vcharthtml/VChartHTML.html): Halbwertszeiten der Ba-141- und Kr-92-Folgekerne.
 - [Elektronenkonfiguration](https://www.chemie.de/lexikon/Elektronenkonfiguration.html): Schalen und Reihenfolge der besetzten Unterschalen. Daraus folgt bei den ersten 20 neutralen Atomen die schulische Besetzung 2/8/8/2.
 
 Die ergänzten Quellen wurden direkt abgerufen; alle Schaubilder bleiben eigene, didaktisch reduzierte Zeichnungen. Fremde Bilddateien werden nicht übernommen.
 
-Abruf der direkt geprüften Quellen: 19.10.2026.
+Abruf der direkt geprüften Quellen: 19.10.2026 und 20.10.2026.
 
 ## Pflege und Prüfung
 
@@ -116,8 +122,10 @@ Die Tests prüfen Modelle und Antwortschlüssel, ersetzen aber keine Erprobung m
 
 ### Automatisierte Modellprüfung
 
-Die 13 Node-Tests prüfen unter anderem Schalenbesetzung und tatsächliche Elektronen pro Schale, kumulative Abschirmschichten und verbleibende Gamma-Spuren, Massenzahlen/Ladungen und gezählte Kernteilchen des Spaltungskanals, jeden Schritt der 14-stufigen Uran-Radium-Reihe, exponentielle Verdopplung sowie alle 36 Antwortschlüssel. Hinzu kommen statistische Halbwertszeit-Prüfungen mit 100 000 Anfangskernen.
+Die 17 Node-Tests prüfen unter anderem Schalenbesetzung und tatsächliche Elektronen pro Schale, kumulative Abschirmschichten und verbleibende Gamma-Spuren, Massenzahlen/Ladungen und gezählte Kernteilchen des Spaltungskanals, jeden Schritt der 14-stufigen Uran-Radium-Reihe, exponentielle Verdopplung, die Spaltprodukt-Zerfallsreihen (A konstant, Z + 1, stabile Endkerne), den Kettenbaum 3^g, die Bombenschemata sowie alle 45 Antwortschlüssel. Hinzu kommen statistische Halbwertszeit-Prüfungen mit 100 000 Anfangskernen.
 
 Bei Änderungen außerdem im Browser Zeitregler ohne neue Zufallsreihe, alle neun Stationen, Tastaturnavigation, Mobilansicht und die drei getrennten Druckausgaben prüfen. Ein Testdruck auf realem Papier und eine Erprobung mit einer echten Lerngruppe stehen weiterhin aus.
+
+Prüfstand vom 20.10.2026: 17 Node-Tests bestanden; alle Prinzipbilder (Kettenbaum, Kanonen-/Implosionsprinzip, Wasserstoffbombe) als eigenständige SVG gerendert und visuell geprüft; U-235-Stepper im Browser bis Bildschritt 7 geprüft; das schwarze Dreieck an den Halbwertszeit-Linien (fehlendes fill) behoben.
 
 Prüfstand der Überarbeitung vom 19.10.2026: 13 Node-Tests bestanden; alle 36 Auswahlaufgaben im Browser mit fachlichen Rückmeldungen geprüft. Das Zeitpunkt-Ablesen lässt die vollständige Zufallstabelle unverändert; Tabelle und Kernpunkte stimmen überein. Die getrennten Druckmodi zeigen jeweils nur Lernzettel, Test oder Lösungen und übernehmen eigene Testantworten. Alle neun Stationen wurden bei 320/768/1280 Pixeln ohne Seitenüberlauf geprüft. Ein PDF-Export über das integrierte Browser-Testprotokoll ist nicht verfügbar; die Druck-Medienregeln wurden im Browser geprüft, keine physische Papierausgabe behauptet.
